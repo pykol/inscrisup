@@ -7,4 +7,5 @@ from . import views
 
 urlpatterns = [
     url(r'^$', views.index, name='index'),
+    url(r'^classe/(?P<slug>[-\w]+)/$', views.classe, name='classe'),
 ]
