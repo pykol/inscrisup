@@ -28,9 +28,15 @@ class Etudiant(models.Model):
     dossier_parcoursup = models.IntegerField("numéro de dossier",
             primary_key=True)
 
+    def __str__(self):
+        return "%s %s" % (self.nom, self.prenom,)
+
 class Classe(models.Model):
     nom = models.CharField(max_length=20)
     slug = models.SlugField()
+
+    def __str__(self):
+        return self.nom
 
 class Proposition(models.Model):
     classe = models.ForeignKey(Classe, on_delete=models.CASCADE)
