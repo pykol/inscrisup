@@ -30,6 +30,7 @@ class Etudiant(models.Model):
 
 class Classe(models.Model):
     nom = models.CharField(max_length=20)
+    slug = models.SlugField()
 
 class Proposition(models.Model):
     classe = models.ForeignKey(Classe, on_delete=models.CASCADE)
