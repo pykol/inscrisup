@@ -31,6 +31,9 @@ class Etudiant(models.Model):
     def __str__(self):
         return "%s %s" % (self.nom, self.prenom,)
 
+    class Meta:
+        verbose_name = "étudiant"
+
 class Classe(models.Model):
     nom = models.CharField(max_length=20)
     slug = models.SlugField(unique=True)
