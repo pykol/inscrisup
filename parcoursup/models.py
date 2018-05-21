@@ -24,7 +24,7 @@ class Etudiant(models.Model):
     nom = models.CharField(max_length=100)
     prenom = models.CharField("prénom", max_length=100)
     date_naissance = models.DateField("date de naissance")
-    email = models.EmailField()
+    email = models.EmailField(blank=True, null=False)
     dossier_parcoursup = models.IntegerField("numéro de dossier",
             primary_key=True)
 
