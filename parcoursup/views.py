@@ -8,7 +8,8 @@ from django.views import generic
 from .models import Classe, Etudiant
 
 def index(request):
-    return HttpResponse("Inscrisup")
+    return render(request, 'parcoursup/index.html',
+            {'classes_list': Classe.objects.all,})
 
 class ClasseDetailView(generic.DetailView):
     model = Classe

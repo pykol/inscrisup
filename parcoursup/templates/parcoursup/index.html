@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8">
+    <title>Suivi des inscriptions</title>
+  </head>
+  <body>
+    <h1>Suivi des inscriptions en CPGE</h1>
+    <aside>
+      {% if classes_list %}
+      <ul>
+        {% for classe in classes_list %}
+        <li><a href="{{ classe.get_absolute_url }}">{{ classe }}</a></li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+    </aside>
+  </body>
+</html>
