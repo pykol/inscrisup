@@ -19,6 +19,7 @@
 from __future__ import unicode_literals
 
 from django.db import models
+from django.urls import reverse
 
 class Etudiant(models.Model):
     nom = models.CharField(max_length=100)
@@ -31,6 +32,9 @@ class Etudiant(models.Model):
     def __str__(self):
         return "%s %s" % (self.nom, self.prenom,)
 
+    def get_absolute_url(self):
+        return reverse('etudiant.details', args=[str(self.pk),])
+
     class Meta:
         verbose_name = "étudiant"
 
@@ -40,6 +44,9 @@ class Classe(models.Model):
 
     def __str__(self):
         return self.nom
+
+    def get_absolute_url(self):
+        return reverse('classe.details', args=[self.slug,])
 
 class Proposition(models.Model):
     classe = models.ForeignKey(Classe, on_delete=models.CASCADE)
