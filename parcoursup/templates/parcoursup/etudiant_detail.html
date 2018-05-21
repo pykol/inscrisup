@@ -7,5 +7,27 @@
   <body>
     <h1>Suivi des inscriptions en CPGE</h1>
     <h2>{{ etudiant }}</h2>
+
+    <h3>Propositions d'admission</h3>
+    {% if etudiant.proposition_set.count > 0 %}
+    <table>
+      <tr>
+        <th>Date</th>
+        <th>Classe</th>
+        <th>Internat</th>
+        <th>Statut</th>
+      </tr>
+      {% for proposition in etudiant.proposition_set.all %}
+      <tr>
+        <td>{{ proposition.date_proposition }}</td>
+        <td><a href="{{ proposition.classe.get_absolute_url }}">{{ proposition.classe }}</a></td>
+        <td>{{ proposition.internat|yesno }}</td>
+        <td>{{ proposition.get_statut_display }}</td>
+      </tr>
+      {% endfor %}
+    </table>
+    {% else %}
+    <p>Aucune proposition d'admission à ce jour.</p>
+    {% endif %}
   </body>
 </html>
