@@ -49,7 +49,7 @@ class Etudiant(models.Model):
         verbose_name = "étudiant"
 
     @transaction.atomic
-    def nouvelle_proposition(self, classe, date, internat):
+    def nouvelle_proposition(self, nouv_prop):
         """Enregistrement d'une nouvelle proposition d'admission.
 
         Cette méthode enregistre une nouvelle proposition d'admission
@@ -64,12 +64,11 @@ class Etudiant(models.Model):
         """
         old_prop = self.proposition_actuelle
 
-        if old_prop and old_prop.classe == classe and \
-                old_prop.internat == internat:
+        if old_prop and old_prop.classe == nouv_prop.classe and \
+                old_prop.internat == nouv_prop.internat:
             return
 
-        nouv_prop = Proposition(classe=classe, date_proposition=date,
-                internat=internat, etudiant=self, remplace=old_prop)
+        nouv_prop.remplace = old_prop
         nouv_prop.save()
 
         self.proposition_actuelle = nouv_prop
@@ -77,23 +76,31 @@ class Etudiant(models.Model):
 
         if not old_prop:
             Action(proposition=nouv_prop,
-                    categorie=Action.ENVOI_DOSSIER, date=date).save()
+                    categorie=Action.ENVOI_DOSSIER,
+                    date=nouv_prop.date_proposition).save()
         else:
             # Ajout de la nouvelle proposition et démission de
             # l'ancienne.
-            old_prop.date_demission = date
+            old_prop.date_demission = nouv_prop.date_proposition
             old_prop.save()
 
             # S'il y a lieu d'enregistrer de nouvelles actions, on le
             # fait immédiatement
-            if old_prop.internat != internat:
+            if not old_prop.internat and nouv_prop.internat:
                 Action(proposition=nouv_prop,
                         categorie=Action.ENVOI_DOSSIER_INTERNAT,
-                        date=date).save()
-            if old_prop.classe != classe:
+                        date=nouv_prop.date_proposition).save()
+
+            if old_prop.internat and not nouv_prop.internat:
                 Action(proposition=nouv_prop,
                         categorie=Action.INSCRIPTION,
-                        date=date,
+                        date=nouv_prop.date_proposition,
+                        message="L'étudiant a renoncé à l'internat").save()
+
+            if old_prop.classe != nouv_prop.classe:
+                Action(proposition=nouv_prop,
+                        categorie=Action.INSCRIPTION,
+                        date=nouv_prop.date_proposition,
                         message="L'étudiant a changé de classe").save()
 
 class Classe(models.Model):
