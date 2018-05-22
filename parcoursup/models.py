@@ -111,13 +111,16 @@ class Etudiant(models.Model):
         administratives qui n'avaient pas encore été accomplies pour le
         candidat.
         """
-        self.date_demission = date
-        actions = Action.objects.filter(statut=Action.STATUT_TODO,
-                proposition__etudiant=self.etudiant)
-        for action in actions:
-            action.traiter()
+        proposition = self.proposition_actuelle
+        proposition.date_demission = date
+        proposition.save()
 
-        Action(proposition=self,
+        actions = Action.objects.filter(statut=Action.STATUT_TODO,
+                proposition__etudiant=self)
+        for action in actions:
+            action.annuler(date)
+
+        Action(proposition=proposition,
                 categorie=Action.DEMISSION,
                 date=date).save()
 

@@ -9,8 +9,14 @@
     <h2>{{ etudiant }}</h2>
 
     <h3>Propositions d'admission</h3>
-    <p><a href="{% url 'proposition.ajout' %}?etudiant={{ etudiant.pk }}">Ajouter
-      une nouvelle proposition</a></p>
+    <ul>
+      <li><a href="{% url 'proposition.ajout' %}?etudiant={{ etudiant.pk }}">Ajouter
+          une nouvelle proposition</a></li>
+      {% if etudiant.proposition_actuelle %}
+      <li><a href="{% url 'etudiant.demission' etudiant.pk %}">Démission</a></li>
+      {% endif %}
+    </ul>
+    <p>
     {% if etudiant.proposition_set.count > 0 %}
     <table>
       <tr>

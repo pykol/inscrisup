@@ -25,7 +25,7 @@ from django.http import HttpResponseRedirect
 from django.views import generic
 from django.urls import reverse
 
-from .models import Classe, Etudiant, Action
+from .models import Classe, Etudiant, Action, Proposition
 from .forms import PropositionForm
 
 def index(request):
@@ -59,6 +59,13 @@ def proposition_ajout(request):
             })
 
 class ActionListView(generic.ListView):
+def etudiant_demission(request, pk):
+    etudiant = get_object_or_404(Etudiant, pk=pk)
+    etudiant.demission(datetime.datetime.now())
+
+    return HttpResponseRedirect(reverse('etudiant.details',
+        args=(etudiant.pk,)))
+
     queryset = Action.objects.filter(statut = Action.STATUT_TODO)
 
 class ActionDetailView(generic.DetailView):
