@@ -12,7 +12,7 @@
     <ul>
       <li><a href="{% url 'proposition.ajout' %}?etudiant={{ etudiant.pk }}">Ajouter
           une nouvelle proposition</a></li>
-      {% if etudiant.proposition_actuelle %}
+      {% if etudiant.proposition_actuelle and not etudiant.proposition_actuelle.date_demission %}
       <li><a href="{% url 'etudiant.demission' etudiant.pk %}">Démission</a></li>
       {% endif %}
     </ul>
