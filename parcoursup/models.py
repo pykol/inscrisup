@@ -66,6 +66,12 @@ class Proposition(models.Model):
         )
     statut = models.SmallIntegerField(choices=STATUT_CHOICES)
 
+    def __str__(self):
+        return str(self.date_proposition)
+
+    class Meta:
+        get_latest_by = 'date_proposition'
+
 class Action(models.Model):
     proposition = models.ForeignKey(Proposition,
             on_delete=models.CASCADE)
