@@ -7,5 +7,23 @@
   <body>
     <h1>Suivi des inscriptions en CPGE</h1>
     <h2>{{ classe }}</h2>
+
+    <h3>Propositions d'admission</h3>
+    <table>
+      <tr>
+        <th>Date</th>
+        <th>Étudiant</th>
+        <th>Internat</th>
+        <th>Statut</th>
+      </tr>
+      {% for etudiant in classe.admissions %}
+      <tr>
+        <td>{{ etudiant.proposition.date_proposition }}</td>
+        <td><a href="{{ etudiant.get_absolute_url }}">{{ etudiant }}</a></td>
+        <td>{{ etudiant.proposition.internat|yesno }}</td>
+        <td>{{ etudiant.proposition.get_statut_display }}</td>
+      </tr>
+      {% endfor %}
+    </table>
   </body>
 </html>

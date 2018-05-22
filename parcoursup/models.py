@@ -21,6 +21,11 @@ from __future__ import unicode_literals
 from django.db import models
 from django.urls import reverse
 
+class EtudiantManager(models.Manager):
+    def par_classe(self, classe):
+        return self.get_queryset().filter(proposition_actuelle__classe=classe,
+            proposition__date_demission__isnull=True)
+
 class Etudiant(models.Model):
     nom = models.CharField(max_length=100)
     prenom = models.CharField("prénom", max_length=100)
@@ -28,6 +33,10 @@ class Etudiant(models.Model):
     email = models.EmailField(blank=True, null=False)
     dossier_parcoursup = models.IntegerField("numéro de dossier",
             primary_key=True)
+    proposition_actuelle = models.ForeignKey('Proposition', blank=True,
+            null=True, related_name='+')
+
+    objects = EtudiantManager()
 
     def __str__(self):
         return "%s %s" % (self.nom, self.prenom,)
@@ -47,6 +56,9 @@ class Classe(models.Model):
 
     def get_absolute_url(self):
         return reverse('classe.details', args=[self.slug,])
+
+    def admissions(self):
+        return Etudiant.objects.par_classe(self)
 
 class Proposition(models.Model):
     classe = models.ForeignKey(Classe, on_delete=models.CASCADE)
