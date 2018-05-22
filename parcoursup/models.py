@@ -19,6 +19,7 @@
 from __future__ import unicode_literals
 
 from django.db import models
+from django.db import transaction
 from django.urls import reverse
 
 class EtudiantManager(models.Manager):
@@ -46,6 +47,54 @@ class Etudiant(models.Model):
 
     class Meta:
         verbose_name = "étudiant"
+
+    @transaction.atomic
+    def nouvelle_proposition(self, classe, date, internat):
+        """Enregistrement d'une nouvelle proposition d'admission.
+
+        Cette méthode enregistre une nouvelle proposition d'admission
+        pour un étudiant si cette proposition est différente de ce que
+        l'étudiant avait obtenu précédemment (on considère pour cela la
+        classe et l'admission à l'internat). Lorsque l'étudiant n'avait
+        précédemment aucune proposition, on enregistre simplement la
+        nouvelle.
+
+        Cette méthode crée également les actions administrative à
+        réaliser suite à cette proposition.
+        """
+        old_prop = self.proposition_actuelle
+
+        if old_prop and old_prop.classe == classe and \
+                old_prop.internat == internat:
+            return
+
+        nouv_prop = Proposition(classe=classe, date_proposition=date,
+                internat=internat, etudiant=self, remplace=old_prop)
+        nouv_prop.save()
+
+        self.proposition_actuelle = nouv_prop
+        self.save()
+
+        if not old_prop:
+            Action(proposition=nouv_prop,
+                    categorie=Action.ENVOI_DOSSIER, date=date).save()
+        else:
+            # Ajout de la nouvelle proposition et démission de
+            # l'ancienne.
+            old_prop.date_demission = date
+            old_prop.save()
+
+            # S'il y a lieu d'enregistrer de nouvelles actions, on le
+            # fait immédiatement
+            if old_prop.internat != internat:
+                Action(proposition=nouv_prop,
+                        categorie=Action.ENVOI_DOSSIER_INTERNAT,
+                        date=date).save()
+            if old_prop.classe != classe:
+                Action(proposition=nouv_prop,
+                        categorie=Action.INSCRIPTION,
+                        date=date,
+                        message="L'étudiant a changé de classe").save()
 
 class Classe(models.Model):
     nom = models.CharField(max_length=20)
