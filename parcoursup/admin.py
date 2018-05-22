@@ -6,7 +6,6 @@ from django.contrib import admin
 from .models import Etudiant, Classe, Proposition, Action
 
 admin.site.register(Classe)
-admin.site.register(Action)
 
 class PropositionAdmin(admin.ModelAdmin):
     list_display = ('date_proposition', 'classe', 'etudiant',
@@ -23,3 +22,9 @@ class EtudiantAdmin(admin.ModelAdmin):
     inlines = [PropositionInline]
 
 admin.site.register(Etudiant, EtudiantAdmin)
+
+class ActionAdmin(admin.ModelAdmin):
+    list_display = ('proposition', 'date', 'categorie', 'statut',
+            'message',)
+
+admin.site.register(Action, ActionAdmin)
