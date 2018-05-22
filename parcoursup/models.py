@@ -103,6 +103,24 @@ class Etudiant(models.Model):
                         date=nouv_prop.date_proposition,
                         message="L'étudiant a changé de classe").save()
 
+    @transaction.atomic
+    def demission(self, date):
+        """Enregistre la démission d'un candidat.
+
+        Cette méthode annule également toutes les actions
+        administratives qui n'avaient pas encore été accomplies pour le
+        candidat.
+        """
+        self.date_demission = date
+        actions = Action.objects.filter(statut=Action.STATUT_TODO,
+                proposition__etudiant=self.etudiant)
+        for action in actions:
+            action.traiter()
+
+        Action(proposition=self,
+                categorie=Action.DEMISSION,
+                date=date).save()
+
 class Classe(models.Model):
     nom = models.CharField(max_length=20)
     slug = models.SlugField(unique=True)
