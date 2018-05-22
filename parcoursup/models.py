@@ -68,7 +68,7 @@ class Proposition(models.Model):
     date_demission = models.DateTimeField(blank=True, null=True)
     internat = models.BooleanField()
     remplace = models.ForeignKey('self', blank=True, null=True,
-            on_delete=models.SET_NULL)
+            on_delete=models.SET_NULL, related_name='remplacee_par')
 
     STATUT_OUI = 0
     STATUT_OUIMAIS = 1
@@ -114,4 +114,7 @@ class Action(models.Model):
             (STATUT_FAIT, "Fait"),
             (STATUT_RIEN, "Rien à faire"),
         )
-    statut = models.SmallIntegerField(choices=STATUT_CHOICES)
+    statut = models.SmallIntegerField(choices=STATUT_CHOICES,
+            default=STATUT_TODO)
+
+    message = models.TextField(blank=True, null=False)
