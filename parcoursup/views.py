@@ -58,7 +58,6 @@ def proposition_ajout(request):
                 'form': form,
             })
 
-class ActionListView(generic.ListView):
 def etudiant_demission(request, pk):
     etudiant = get_object_or_404(Etudiant, pk=pk)
     etudiant.demission(datetime.datetime.now())
@@ -66,6 +65,7 @@ def etudiant_demission(request, pk):
     return HttpResponseRedirect(reverse('etudiant.details',
         args=(etudiant.pk,)))
 
+class ActionTodoListView(generic.ListView):
     queryset = Action.objects.filter(statut = Action.STATUT_TODO)
 
 class ActionDetailView(generic.DetailView):
