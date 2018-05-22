@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8">
+    <title>Actions à réaliser − Suivi des inscriptions</title>
+  </head>
+  <body>
+    <h1>Suivi des inscriptions en CPGE</h1>
+    <h2>Actions à réaliser</h1>
+    <table>
+      <tr>
+        <th>Classe</th>
+        <th>Étudiant</th>
+        <th>Action à réaliser</th>
+        <th>Traiter</th>
+      </tr>
+      {% for action in action_list %}
+      <tr>
+        <td>{{ action.proposition.classe }}</td>
+        <td>{{ action.proposition.etudiant }}</td>
+        <td>{{ action.get_categorie_display }} {{ action.message }}</td>
+        <td><a href="{% url 'action.traiter' action.pk %}">Traiter</a></td>
+      </tr>
+      {% endfor %}
+    </table>
+  </body>
+</html>

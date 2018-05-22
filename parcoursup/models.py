@@ -174,3 +174,10 @@ class Action(models.Model):
             default=STATUT_TODO)
 
     message = models.TextField(blank=True, null=False)
+
+    def traiter(self, date):
+        """Marque une action comme traitée à la date donnée"""
+        if self.statut != STATUT_FAIT:
+            self.date = date
+            self.statut = STATUT_FAIT
+            self.save()
