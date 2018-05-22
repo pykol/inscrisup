@@ -9,6 +9,7 @@ from django.views import generic
 from django.urls import reverse
 
 from .models import Classe, Etudiant, Action
+from .forms import PropositionForm
 
 def index(request):
     return render(request, 'parcoursup/index.html',
@@ -19,6 +20,26 @@ class ClasseDetailView(generic.DetailView):
 
 class EtudiantDetailView(generic.DetailView):
     model = Etudiant
+
+def proposition_ajout(request):
+    if request.method == 'POST':
+        form = PropositionForm(request.POST)
+        if form.is_valid():
+            form.save()
+            etudiant = Etudiant.objects.get(pk=form.data['etudiant'])
+            return HttpResponseRedirect(etudiant.get_absolute_url())
+    else:
+        form = PropositionForm()
+        try:
+            # TODO existence de l'étudiant à vérifier ?
+            form.fields['etudiant'].initial = request.GET['etudiant']
+        except KeyError:
+            pass
+
+    return render(request, 'parcoursup/proposition_ajout.html',
+            {
+                'form': form,
+            })
 
 class ActionListView(generic.ListView):
     queryset = Action.objects.filter(statut = Action.STATUT_TODO)
