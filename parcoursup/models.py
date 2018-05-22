@@ -35,7 +35,7 @@ class Etudiant(models.Model):
     dossier_parcoursup = models.IntegerField("numéro de dossier",
             primary_key=True)
     proposition_actuelle = models.ForeignKey('Proposition', blank=True,
-            null=True, related_name='+')
+            null=True, related_name='+', on_delete=models.SET_NULL)
 
     objects = EtudiantManager()
 
