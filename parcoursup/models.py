@@ -183,10 +183,12 @@ class Action(models.Model):
     STATUT_TODO = 0
     STATUT_FAIT = 1
     STATUT_RIEN = 2
+    STATUT_ANNULEE = 3
     STATUT_CHOICES = (
             (STATUT_TODO, "À traiter"),
             (STATUT_FAIT, "Fait"),
             (STATUT_RIEN, "Rien à faire"),
+            (STATUT_ANNULEE, "Annulée"),
         )
     statut = models.SmallIntegerField(choices=STATUT_CHOICES,
             default=STATUT_TODO)
@@ -195,7 +197,14 @@ class Action(models.Model):
 
     def traiter(self, date):
         """Marque une action comme traitée à la date donnée"""
-        if self.statut != STATUT_FAIT:
+        if self.statut == Action.STATUT_TODO:
             self.date = date
-            self.statut = STATUT_FAIT
+            self.statut = Action.STATUT_FAIT
+            self.save()
+
+    def annuler(self, date):
+        """Marque une action comme annulée à la date donnée"""
+        if self.statut == Action.STATUT_TODO:
+            self.date = date
+            self.statut = Action.STATUT_ANNULEE
             self.save()
