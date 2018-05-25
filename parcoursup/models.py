@@ -34,6 +34,7 @@ class Etudiant(models.Model):
     email = models.EmailField(blank=True, null=False)
     dossier_parcoursup = models.IntegerField("numéro de dossier",
             primary_key=True)
+    adresse = models.TextField(blank=True, null=False)
     proposition_actuelle = models.ForeignKey('Proposition', blank=True,
             null=True, related_name='+', on_delete=models.SET_NULL)
 
