@@ -129,6 +129,7 @@ class Classe(models.Model):
     nom = models.CharField(max_length=20)
     slug = models.SlugField(unique=True)
     code_parcoursup = models.SmallIntegerField()
+    groupe_parcoursup = models.SmallIntegerField()
 
     def __str__(self):
         return self.nom
