@@ -71,7 +71,7 @@ class ActionTodoListView(generic.ListView):
 class ActionDetailView(generic.DetailView):
     model = Action
 
-def action_traiter(self, pk):
+def action_traiter(request, pk):
     action = get_object_or_404(Action, pk=pk)
     action.traiter(datetime.datetime.now())
     return HttpResponseRedirect(reverse('action.liste'))
