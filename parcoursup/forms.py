@@ -33,3 +33,6 @@ class PropositionForm(forms.ModelForm):
         if nouv_prop:
             nouv_prop.etudiant.nouvelle_proposition(nouv_prop)
         return nouv_prop
+
+class ParcoursupImportForm(forms.Form):
+    fichier_parcoursup = forms.FileField()

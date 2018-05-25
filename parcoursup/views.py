@@ -26,7 +26,7 @@ from django.views import generic
 from django.urls import reverse
 
 from .models import Classe, Etudiant, Action, Proposition
-from .forms import PropositionForm
+from .forms import PropositionForm, ParcoursupImportForm
 
 def index(request):
     return render(request, 'parcoursup/index.html',
@@ -75,3 +75,47 @@ def action_traiter(self, pk):
     action = get_object_or_404(Action, pk=pk)
     action.traiter(datetime.datetime.now())
     return HttpResponseRedirect(reverse('action.liste'))
+
+def parcoursup_import(request):
+    if request.method == 'POST':
+        form = ParcoursupImportForm(request.POST, request.FILES)
+        if form.is_valid():
+            dossiers_dans_fichier = []
+            #TODO traitement du fichier Parcoursup
+            for ligne in fichier:
+                numero = int(ligne[0])
+                try:
+                    etudiant = Etudiant.objects.get(pk=numero)
+                except Etudiant.DoesNotExist:
+                    etudiant = Etudiant(
+                            dossier_parcoursup=numero,
+                            nom=ligne[1],
+                            prenom=ligne[2],
+                            date_naissance=ligne[3],
+                            email=ligne[4])
+                    etudiant.save()
+
+                classe = Classe.objects.get(nom=ligne[5])
+                internat = ligne[6]
+
+                proposition = Proposition(
+                        classe=classe,
+                        etudiant=etudiant,
+                        date_proposition=datetime.datetime.now(),#XXX fichier ?
+                        internat=internat,
+                        statut=ligne[7])
+
+                etudiant.nouvelle_proposition(proposition)
+
+                dossiers_dans_fichier.append(numero)
+
+            demissionnaires = Etudiant.objects.filter(dossier_parcoursup__not_in=dossiers_dans_fichier)
+            for dem in demissionnaires:
+                dem.demission(datetime.datetime.now())
+    else:
+        form = ParcoursupImportForm()
+
+    return render(request, 'parcoursup/parcoursup_import.html',
+            {
+                'form': form,
+            })
