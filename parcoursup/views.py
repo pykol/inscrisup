@@ -23,13 +23,17 @@ import datetime
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views import generic
 from django.urls import reverse
+from django.db.models import Count
 
 from .models import Classe, Etudiant, Action, Proposition
 from .forms import PropositionForm, ParcoursupImportForm
 from .import_parcoursup import Parcoursup
 
 def index(request):
-    return render(request, 'parcoursup/index.html')
+    classes = Classe.objects.all().annotate(
+            num_admis=Count('proposition', remplacee_par__isnull=True))
+    return render(request, 'parcoursup/index.html', context={
+        'classe_list': classes})
 
 class ClasseDetailView(generic.DetailView):
     model = Classe

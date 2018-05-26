@@ -2,6 +2,17 @@
 {% block main %}
 <h2>{{ classe }}</h2>
 
+<table>
+  <tr>
+    <th>Oui définitif</th>
+    <td>{{ classe.admissions_oui|length }}</td>
+  </tr>
+  <tr>
+    <th>Oui avec vœux en attente</th>
+    <td>{{ classe.admissions_ouimais|length }}</td>
+  </tr>
+</table>
+
 <h3>Propositions d'admission</h3>
 <table>
   <tr>

@@ -143,6 +143,12 @@ class Classe(models.Model):
     def admissions(self):
         return Etudiant.objects.par_classe(self)
 
+    def admissions_oui(self):
+        return self.admissions().filter(proposition_actuelle__statut=Proposition.STATUT_OUI)
+
+    def admissions_ouimais(self):
+        return self.admissions().filter(proposition_actuelle__statut=Proposition.STATUT_OUIMAIS)
+
 class Proposition(models.Model):
     classe = models.ForeignKey(Classe, on_delete=models.CASCADE)
     etudiant = models.ForeignKey(Etudiant,

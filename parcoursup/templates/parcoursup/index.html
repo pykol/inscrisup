@@ -18,6 +18,22 @@
 
     <section id="main">
       {% block main %}
+      <h2>Résumé</h2>
+      <table>
+        <tr>
+          <th>Classe</th>
+          <th>Oui définitifs</th>
+          <th>Oui avec vœux en attente</th>
+          <th>Total</th>
+        </tr>
+        {% for classe in classe_list %}
+        <tr class="{% if classe.num_admis <= classe.capacite %}capacite_ok{% else %}{% if classe.num_admis <= classe.surbooking %}capacite_surbooking{% else %}capacite_trop{% endif %}{% endif %}">
+          <td><a href="{{ classe.get_absolute_url }}">{{ classe }}</a></td>
+          <td>{{ classe.admissions_oui|length }}</td>
+          <td>{{ classe.admissions_ouimais|length }}</td>
+          <td>{{ classe.num_admis }}</td>
+        </tr>
+        {% endfor %}
       {% endblock %}
     </section>
 
