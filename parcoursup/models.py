@@ -132,6 +132,7 @@ class Classe(models.Model):
     code_parcoursup = models.SmallIntegerField()
     groupe_parcoursup = models.SmallIntegerField()
     capacite = models.SmallIntegerField(verbose_name="capacité")
+    surbooking = models.SmallIntegerField(default=0)
 
     def __str__(self):
         return self.nom
