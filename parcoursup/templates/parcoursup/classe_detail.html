@@ -6,13 +6,14 @@
 <table>
   <tr>
     <th>Date</th>
-    <th>Étudiant</th>
+    <th colspan="2">Étudiant</th>
     <th>Internat</th>
     <th>Statut</th>
   </tr>
   {% for etudiant in classe.admissions %}
   <tr>
     <td>{{ etudiant.proposition_actuelle.date_proposition }}</td>
+    <td>{{ etudiant.dossier_parcoursup }}</td>
     <td><a href="{{ etudiant.get_absolute_url }}">{{ etudiant }}</a></td>
     <td>{{ etudiant.proposition_actuelle.internat|yesno }}</td>
     <td>{{ etudiant.proposition_actuelle.get_statut_display }}</td>

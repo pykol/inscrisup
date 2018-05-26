@@ -12,7 +12,7 @@
 <table>
   <tr>
     <th>Classe</th>
-    <th>Étudiant</th>
+    <th colspan="2">Étudiant</th>
     <th>Statut</th>
     <th>Internat</th>
     <th>Action à réaliser</th>
@@ -21,6 +21,7 @@
   {% for action in action_list %}
   <tr>
     <td><a href="{{ action.proposition.classe.get_absolute_url }}">{{ action.proposition.classe }}</a></td>
+    <td>{{ action.proposition.etudiant.dossier_parcoursup }}</td>
     <td><a href="{{ action.proposition.etudiant.get_absolute_url }}">{{ action.proposition.etudiant }}</a></td>
     <td>{{ action.proposition.get_statut_display }}</td>
     <td>{{ action.proposition.internat|yesno }}</td>
