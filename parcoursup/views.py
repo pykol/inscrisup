@@ -20,8 +20,7 @@ from __future__ import unicode_literals
 
 import datetime
 
-from django.shortcuts import render, get_object_or_404
-from django.http import HttpResponseRedirect
+from django.shortcuts import render, get_object_or_404, redirect
 from django.views import generic
 from django.urls import reverse
 
@@ -44,7 +43,7 @@ def proposition_ajout(request):
         if form.is_valid():
             form.save()
             etudiant = Etudiant.objects.get(pk=form.data['etudiant'])
-            return HttpResponseRedirect(etudiant.get_absolute_url())
+            return redirect(etudiant)
     else:
         form = PropositionForm()
         try:
@@ -62,8 +61,7 @@ def etudiant_demission(request, pk):
     etudiant = get_object_or_404(Etudiant, pk=pk)
     etudiant.demission(datetime.datetime.now())
 
-    return HttpResponseRedirect(reverse('etudiant.details',
-        args=(etudiant.pk,)))
+    return redirect('etudiant.details', pk=etudiant.pk)
 
 class ActionTodoListView(generic.ListView):
     queryset = Action.objects.filter(statut = Action.STATUT_TODO)
@@ -74,7 +72,7 @@ class ActionDetailView(generic.DetailView):
 def action_traiter(request, pk):
     action = get_object_or_404(Action, pk=pk)
     action.traiter(datetime.datetime.now())
-    return HttpResponseRedirect(reverse('action.liste'))
+    return redirect('action.liste')
 
 def parcoursup_import(request):
     if request.method == 'POST':
