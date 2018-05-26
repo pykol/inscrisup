@@ -33,4 +33,5 @@ urlpatterns = [
     url(r'^action/$', views.ActionTodoListView.as_view(), name='action.liste'),
     url(r'^action/(?P<pk>[0-9]+)/$', views.ActionDetailView.as_view(), name='action.details'),
     url(r'^action/(?P<pk>[0-9]+)/traiter$', views.action_traiter, name='action.traiter'),
+    url(r'^action/pdf_adresses/$', views.export_pdf_adresses, name='action.export_pdf_adresses'),
 ]

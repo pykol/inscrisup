@@ -9,6 +9,8 @@
 {% plural %}
 <h2>{{ action_count }} actions à réaliser</h2>
 {% endblocktrans %}
+<p><a href="{% url 'action.export_pdf_adresses' %}"><i class="fas
+fa-print"></i>Imprimer les adresses</a></p>
 <table>
   <tr>
     <th>Classe</th>

@@ -21,6 +21,7 @@ from __future__ import unicode_literals
 import datetime
 
 from django.shortcuts import render, get_object_or_404, redirect
+from django.http import HttpResponse
 from django.views import generic
 from django.urls import reverse
 from django.db.models import Count
@@ -28,6 +29,7 @@ from django.db.models import Count
 from .models import Classe, Etudiant, Action, Proposition
 from .forms import PropositionForm, ParcoursupImportForm
 from .import_parcoursup import Parcoursup
+from .pdf_adresses import pdf_adresses
 
 def index(request):
     classes = Classe.objects.all().annotate(
@@ -163,3 +165,13 @@ def parcoursup_auto_import(request):
             etudiant.demission(psup_prop.date_reponse)
 
     return redirect('index')
+
+def export_pdf_adresses(request):
+    actions = Action.objects.filter(statut=Action.STATUT_TODO,
+            categorie__in=(Action.ENVOI_DOSSIER,
+                Action.ENVOI_DOSSIER_INTERNAT))
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="adresses_parcoursup.pdf"'
+    pdf_adresses(actions, response)
+
+    return response
