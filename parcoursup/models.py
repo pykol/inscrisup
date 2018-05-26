@@ -68,6 +68,9 @@ class Etudiant(models.Model):
 
         if old_prop and old_prop.classe == nouv_prop.classe and \
                 old_prop.internat == nouv_prop.internat:
+            if old_prop.statut != nouv_prop.statut:
+                old_prop.statut = nouv_prop.statut
+                old_prop.save()
             return
 
         nouv_prop.remplace = old_prop
