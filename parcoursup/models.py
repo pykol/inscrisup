@@ -131,6 +131,7 @@ class Classe(models.Model):
     slug = models.SlugField(unique=True)
     code_parcoursup = models.SmallIntegerField()
     groupe_parcoursup = models.SmallIntegerField()
+    capacite = models.SmallIntegerField(verbose_name="capacité")
 
     def __str__(self):
         return self.nom
