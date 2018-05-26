@@ -151,6 +151,7 @@ class Proposition(models.Model):
     remplace = models.ForeignKey('self', blank=True, null=True,
             on_delete=models.SET_NULL, related_name='remplacee_par')
 
+    # Prendre les mêmes valeurs que dans l'import Parcoursup
     STATUT_OUI = 0
     STATUT_OUIMAIS = 1
     STATUT_CHOICES = (

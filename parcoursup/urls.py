@@ -29,6 +29,7 @@ urlpatterns = [
     url(r'^etudiant/(?P<pk>[0-9]+)/demission$', views.etudiant_demission, name='etudiant.demission'),
     url(r'^proposition/ajout/$', views.proposition_ajout, name='proposition.ajout'),
     url(r'^proposition/import/$', views.parcoursup_import, name='proposition.parcoursup_import'),
+    url(r'^proposition/import/auto$', views.parcoursup_auto_import, name='proposition.parcoursup_auto_import'),
     url(r'^action/$', views.ActionTodoListView.as_view(), name='action.liste'),
     url(r'^action/(?P<pk>[0-9]+)/$', views.ActionDetailView.as_view(), name='action.details'),
     url(r'^action/(?P<pk>[0-9]+)/traiter$', views.action_traiter, name='action.traiter'),

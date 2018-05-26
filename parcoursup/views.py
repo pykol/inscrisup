@@ -26,6 +26,7 @@ from django.urls import reverse
 
 from .models import Classe, Etudiant, Action, Proposition
 from .forms import PropositionForm, ParcoursupImportForm
+from .import_parcoursup import Parcoursup
 
 def index(request):
     return render(request, 'parcoursup/index.html',
@@ -117,3 +118,45 @@ def parcoursup_import(request):
             {
                 'form': form,
             })
+
+def parcoursup_auto_import(request):
+    psup = Parcoursup()
+    psup.connect('utilisateur_parcoursup', 'mot_de_passe')
+
+    # Import des propositions d'admission depuis Parcoursup
+    candidats = {}
+    for classe in Classe.objects.all():
+        if classe.code_parcoursup > 0 and classe.groupe_parcoursup > 0:
+            for (etat, _) in Parcoursup.ETAT_CHOICES:
+                psup.recupere_par_etat(classe, etat, candidats)
+    psup.disconnect()
+
+    # Enregistrer les propositions en base de données
+    for numero in candidats:
+        psup_prop = candidats[numero]
+
+        try:
+            etudiant = Etudiant.objects.get(pk=numero)
+        except Etudiant.DoesNotExist:
+            if psup_prop.etat == Parcoursup.ETAT_DEMISSION:
+                continue
+
+            etudiant = Etudiant(
+                    dossier_parcoursup=numero,
+                    nom=psup_prop.nom,
+                    prenom=psup_prop.prenom)
+            etudiant.save()
+
+        if psup_prop.etat != Parcoursup.ETAT_DEMISSION:
+            proposition = Proposition(
+                    classe=psup_prop.classe,
+                    etudiant=etudiant,
+                    date_proposition=psup_prop.date_proposition,
+                    internat=psup_prop.internat,
+                    statut=psup_prop.etat,
+                    )
+            etudiant.nouvelle_proposition(proposition)
+        else:
+            etudiant.demission(psup_prop.date_reponse)
+
+    return redirect('index')
