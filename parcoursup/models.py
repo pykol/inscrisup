@@ -215,3 +215,7 @@ class Action(models.Model):
             self.date = date
             self.statut = Action.STATUT_ANNULEE
             self.save()
+
+    def est_envoi(self):
+        return self.categorie in [Action.ENVOI_DOSSIER,
+                Action.ENVOI_DOSSIER_INTERNAT,]
