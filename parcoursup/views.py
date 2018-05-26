@@ -29,8 +29,7 @@ from .forms import PropositionForm, ParcoursupImportForm
 from .import_parcoursup import Parcoursup
 
 def index(request):
-    return render(request, 'parcoursup/index.html',
-            {'classes_list': Classe.objects.all,})
+    return render(request, 'parcoursup/index.html')
 
 class ClasseDetailView(generic.DetailView):
     model = Classe

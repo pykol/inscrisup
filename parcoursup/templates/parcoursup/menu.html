@@ -1,0 +1,8 @@
+<ul>
+  <li><a href="{% url 'proposition.parcoursup_auto_import' %}"><i
+         class="fas fa-sync"></i>Synchro Parcoursup</a></li>
+  <li><a href="{% url 'action.liste' %}"><i class="fas fa-clipboard-list"></i>Actions à réaliser</a></li>
+  {% for classe in classe_list %}
+  <li><a href="{{ classe.get_absolute_url }}"><i class="fas fa-users"></i>{{ classe }}</a></li>
+  {% endfor %}
+</ul>

@@ -1,21 +1,25 @@
+{% load static %}
+{% load navigation %}
 <!DOCTYPE html>
 <html lang="fr">
   <head>
     <meta charset="utf-8">
     <title>Suivi des inscriptions</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'parcoursup/style.css' %}">
   </head>
   <body>
-    <h1>Suivi des inscriptions en CPGE</h1>
-    <p><a href="{% url 'proposition.parcoursup_import' %}">Import du fichier Parcoursup</a>
-    <p><a href="{% url 'action.liste' %}">Actions à réaliser</a>
-    <aside>
-      {% if classes_list %}
-      <ul>
-        {% for classe in classes_list %}
-        <li><a href="{{ classe.get_absolute_url }}">{{ classe }}</a></li>
-        {% endfor %}
-      </ul>
-      {% endif %}
-    </aside>
+    <header>
+      <h1><a href="{% url 'index' %}">Inscriptions CPGE</a></h1>
+
+      <nav>
+        {% show_menu %}
+      </nav>
+    </header>
+
+    <section id="main">
+      {% block main %}
+      {% endblock %}
+    </section>
+
   </body>
 </html>

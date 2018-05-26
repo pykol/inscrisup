@@ -1,31 +1,40 @@
-<!DOCTYPE html>
-<html lang="fr">
-  <head>
-    <meta charset="utf-8">
-    <title>Actions à réaliser − Suivi des inscriptions</title>
-  </head>
-  <body>
-    <h1>Suivi des inscriptions en CPGE</h1>
-    <h2>Actions à réaliser</h1>
-    <table>
-      <tr>
-        <th>Classe</th>
-        <th>Étudiant</th>
-        <th>Action à réaliser</th>
-        <th>Traiter</th>
-      </tr>
-      {% for action in action_list %}
-      <tr>
-        <td>{{ action.proposition.classe }}</td>
-        <td>{{ action.proposition.etudiant }}</td>
-        <td>{{ action.get_categorie_display }}
-          {% if action.message %}
-          <br>{{ action.message }}
-          {% endif %}
-        </td>
-        <td><a href="{% url 'action.traiter' action.pk %}">Traiter</a></td>
-      </tr>
-      {% endfor %}
-    </table>
-  </body>
-</html>
+{% extends "parcoursup/index.html" %}
+{% load i18n %}
+{% block main %}
+{% if action_list.count == 0 %}
+<h2>Aucune action à réaliser</h2>
+{% else %}
+{% blocktrans count action_count=action_list|length %}
+<h2>Une action à réaliser</h2>
+{% plural %}
+<h2>{{ action_count }} actions à réaliser</h2>
+{% endblocktrans %}
+<table>
+  <tr>
+    <th>Classe</th>
+    <th>Étudiant</th>
+    <th>Statut</th>
+    <th>Internat</th>
+    <th>Action à réaliser</th>
+    <th>Traiter</th>
+  </tr>
+  {% for action in action_list %}
+  <tr>
+    <td><a href="{{ action.proposition.classe.get_absolute_url }}">{{ action.proposition.classe }}</a></td>
+    <td><a href="{{ action.proposition.etudiant.get_absolute_url }}">{{ action.proposition.etudiant }}</a></td>
+    <td>{{ action.proposition.get_statut_display }}</td>
+    <td>{{ action.proposition.internat|yesno }}</td>
+    <td>
+      {% if action.est_envoi %}<i class="fas fa-envelope"></i>{% endif %}
+      {% if action.proposition.internat %}<i class="fas fa-home"></i>{% endif %}
+      {{ action.get_categorie_display }}
+      {% if action.message %}
+      <br>{{ action.message }}
+      {% endif %}
+    </td>
+    <td><a href="{% url 'action.traiter' action.pk %}">Traiter</a></td>
+  </tr>
+  {% endfor %}
+</table>
+{% endif %}
+{% endblock %}

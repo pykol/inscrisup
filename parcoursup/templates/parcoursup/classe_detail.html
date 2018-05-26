@@ -1,29 +1,22 @@
-<!DOCTYPE html>
-<html lang="fr">
-  <head>
-    <meta charset="utf-8">
-    <title>{{ classe }} − Suivi des inscriptions</title>
-  </head>
-  <body>
-    <h1>Suivi des inscriptions en CPGE</h1>
-    <h2>{{ classe }}</h2>
+{% extends "parcoursup/index.html" %}
+{% block main %}
+<h2>{{ classe }}</h2>
 
-    <h3>Propositions d'admission</h3>
-    <table>
-      <tr>
-        <th>Date</th>
-        <th>Étudiant</th>
-        <th>Internat</th>
-        <th>Statut</th>
-      </tr>
-      {% for etudiant in classe.admissions %}
-      <tr>
-        <td>{{ etudiant.proposition.date_proposition }}</td>
-        <td><a href="{{ etudiant.get_absolute_url }}">{{ etudiant }}</a></td>
-        <td>{{ etudiant.proposition.internat|yesno }}</td>
-        <td>{{ etudiant.proposition.get_statut_display }}</td>
-      </tr>
-      {% endfor %}
-    </table>
-  </body>
-</html>
+<h3>Propositions d'admission</h3>
+<table>
+  <tr>
+    <th>Date</th>
+    <th>Étudiant</th>
+    <th>Internat</th>
+    <th>Statut</th>
+  </tr>
+  {% for etudiant in classe.admissions %}
+  <tr>
+    <td>{{ etudiant.proposition_actuelle.date_proposition }}</td>
+    <td><a href="{{ etudiant.get_absolute_url }}">{{ etudiant }}</a></td>
+    <td>{{ etudiant.proposition_actuelle.internat|yesno }}</td>
+    <td>{{ etudiant.proposition_actuelle.get_statut_display }}</td>
+  </tr>
+  {% endfor %}
+</table>
+{% endblock %}

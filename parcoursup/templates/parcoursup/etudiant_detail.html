@@ -1,41 +1,56 @@
-<!DOCTYPE html>
-<html lang="fr">
-  <head>
-    <meta charset="utf-8">
-    <title>{{ etudiant }} − Suivi des inscriptions</title>
-  </head>
-  <body>
-    <h1>Suivi des inscriptions en CPGE</h1>
-    <h2>{{ etudiant }}</h2>
+{% extends "parcoursup/index.html" %}
+{% block main %}
+<h2>{{ etudiant }}</h2>
 
-    <h3>Propositions d'admission</h3>
-    <ul>
-      <li><a href="{% url 'proposition.ajout' %}?etudiant={{ etudiant.pk }}">Ajouter
-          une nouvelle proposition</a></li>
-      {% if etudiant.proposition_actuelle and not etudiant.proposition_actuelle.date_demission %}
-      <li><a href="{% url 'etudiant.demission' etudiant.pk %}">Démission</a></li>
+<h3>Coordonnées</h3>
+<table>
+  <tr>
+    <td><i class="fas fa-home"></i>Adresse</td>
+    <td>{% if etudiant.adresse %}
+      {{ etudiant.adresse }}
+      {% else %}
+      L'adresse n'a pas pu être encore obtenue depuis Parcoursup.
       {% endif %}
-    </ul>
-    <p>
-    {% if etudiant.proposition_set.count > 0 %}
-    <table>
-      <tr>
-        <th>Date</th>
-        <th>Classe</th>
-        <th>Internat</th>
-        <th>Statut</th>
-      </tr>
-      {% for proposition in etudiant.proposition_set.all %}
-      <tr>
-        <td>{{ proposition.date_proposition }}</td>
-        <td><a href="{{ proposition.classe.get_absolute_url }}">{{ proposition.classe }}</a></td>
-        <td>{{ proposition.internat|yesno }}</td>
-        <td>{{ proposition.get_statut_display }}</td>
-      </tr>
-      {% endfor %}
-    </table>
-    {% else %}
-    <p>Aucune proposition d'admission à ce jour.</p>
-    {% endif %}
-  </body>
-</html>
+    </td>
+  </tr>
+  <tr>
+    <td><i class="fas fa-at"></i>E-mail</td>
+    <td>{% if etudiant.email %}
+      <a href="mailto:{{ etudiant.adresse }}">{{ etudiant.adresse }}</a>
+      {% else %}
+      L'e-mail n'a pas pu être encore obtenu depuis Parcoursup.
+      {% endif %}
+    </td>
+  </tr>
+</table>
+
+<h3>Propositions d'admission</h3>
+<ul>
+  <li><a href="{% url 'proposition.ajout' %}?etudiant={{ etudiant.pk }}">Ajouter
+      une nouvelle proposition</a></li>
+  {% if etudiant.proposition_actuelle and not etudiant.proposition_actuelle.date_demission %}
+  <li><a href="{% url 'etudiant.demission' etudiant.pk %}">Démission</a></li>
+  {% endif %}
+</ul>
+<p>
+{% if etudiant.proposition_set.count > 0 %}
+<table>
+  <tr>
+    <th>Date</th>
+    <th>Classe</th>
+    <th>Internat</th>
+    <th>Statut</th>
+  </tr>
+  {% for proposition in etudiant.proposition_set.all %}
+  <tr>
+    <td>{{ proposition.date_proposition }}</td>
+    <td><a href="{{ proposition.classe.get_absolute_url }}">{{ proposition.classe }}</a></td>
+    <td>{{ proposition.internat|yesno }}</td>
+    <td>{{ proposition.get_statut_display }}</td>
+  </tr>
+  {% endfor %}
+</table>
+{% else %}
+<p>Aucune proposition d'admission à ce jour.</p>
+{% endif %}
+{% endblock %}
