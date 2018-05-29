@@ -25,7 +25,8 @@ from django.urls import reverse
 class EtudiantManager(models.Manager):
     def par_classe(self, classe):
         return self.get_queryset().filter(proposition_actuelle__classe=classe,
-            proposition__date_demission__isnull=True)
+            proposition__date_demission__isnull=True,
+            proposition__remplacee_par__isnull=True)
 
 class Etudiant(models.Model):
     nom = models.CharField(max_length=100)

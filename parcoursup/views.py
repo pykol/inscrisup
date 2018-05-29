@@ -24,7 +24,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse
 from django.views import generic
 from django.urls import reverse
-from django.db.models import Count
+from django.db.models import Count, Q
 
 from .models import Classe, Etudiant, Action, Proposition
 from .forms import PropositionForm, ParcoursupImportForm
@@ -33,7 +33,9 @@ from .pdf_adresses import pdf_adresses
 
 def index(request):
     classes = Classe.objects.all().annotate(
-            num_admis=Count('proposition', remplacee_par__isnull=True))
+            num_admis=Count('proposition',
+                filter=Q(proposition__date_demission__isnull=True,
+                    proposition__remplacee_par__isnull=True)))
     return render(request, 'parcoursup/index.html', context={
         'classe_list': classes})
 
