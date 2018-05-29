@@ -29,7 +29,7 @@ ParcoursupProposition = namedtuple('ParcoursupProposition', ('numero',
     'nom', 'prenom', 'etat', 'message', 'internat', 'date_reponse',
     'date_proposition', 'classe'))
 
-ParcoursupColonne = namedtuple('ParcoursupColonne', ('nom', 'position',
+ParcoursupColonne = namedtuple('ParcoursupColonne', ('nom', 'libelle', 'position',
     'parser',))
 
 class Parcoursup:
@@ -84,6 +84,22 @@ class Parcoursup:
                 code_groupe=classe.groupe_parcoursup,
                 etat=etat_url[etat])
 
+    def _trouve_colonnes(self, table_candidats, colonnes):
+        thead = table_candidats.find('thead')
+        positions = {}
+        for index, th in enumerate(thead.find_all('th')):
+            if th.string:
+                positions[th.string.strip()] = index
+
+        res = {}
+        for col in colonnes:
+            colonne = colonnes[col]
+            if colonne.libelle and colonne.libelle in positions:
+                colonne = colonne._replace(position=positions[colonne.libelle])
+            res[col] = colonne
+
+        return res
+
     def recupere_par_etat(self, classe, etat, candidats={}):
         html = self.session.get(self._url_classe_etat(classe, etat))
         soup = bs4.BeautifulSoup(html.text, 'html.parser')
@@ -125,35 +141,36 @@ class Parcoursup:
             locale.setlocale(locale.LC_TIME, old_loc)
             return date
 
-        colonnes_psup = ParcoursupProposition(
-                numero=ParcoursupColonne('numero', 3,
+        colonnes_psup = self._trouve_colonnes(table_candidats, {
+                'numero': ParcoursupColonne('numero', 'N° dossier', 3,
                     lambda c: int(parser_default(c))),
 
-                nom=ParcoursupColonne('nom', 4, parser_nom),
+                'nom': ParcoursupColonne('nom', 'Nom et prénom', 4, parser_nom),
 
-                prenom=ParcoursupColonne('prenom', 4, parser_prenom),
+                'prenom': ParcoursupColonne('prenom', 'Nom et prénom', 4, parser_prenom),
 
-                message=ParcoursupColonne('message', 7, parser_default),
+                'message': ParcoursupColonne('message', 'Etat', 7, parser_default),
 
-                etat=ParcoursupColonne('etat', 7, lambda _: etat),
+                'etat': ParcoursupColonne('etat', 'Etat', 7, lambda _: etat),
 
-                internat=ParcoursupColonne('internat', 9,
+                'internat': ParcoursupColonne('internat', 'Internat', 9,
                     lambda td: parser_default(td) == "Avec internat"),
 
-                date_reponse=ParcoursupColonne('date_reponse', 2, parser_date_reponse),
+                'date_reponse': ParcoursupColonne('date_reponse',
+                    'Date de la réponse', 2, parser_date_reponse),
 
-                date_proposition=ParcoursupColonne('date_proposition', 1,
-                    parser_date_proposition),
+                'date_proposition': ParcoursupColonne('date_proposition',
+                    'Date de la proposition', 1, parser_date_proposition),
 
-                classe=ParcoursupColonne('classe', 0, lambda _: classe),
-            )
+                'classe': ParcoursupColonne('classe', None, 0, lambda _: classe),
+            })
 
         for tr in tbody.find_all('tr', recursive=False):
             tds = tr.find_all('td', recursive=False)
 
             candidat_props = []
             for field_name in ParcoursupProposition._fields:
-                field = getattr(colonnes_psup, field_name)
+                field = colonnes_psup[field_name]
                 candidat_props.append(field.parser(tds[field.position]))
 
             candidat = ParcoursupProposition(*candidat_props)
