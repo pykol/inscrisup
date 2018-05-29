@@ -33,6 +33,16 @@ ParcoursupColonne = namedtuple('ParcoursupColonne', ('nom', 'libelle', 'position
     'parser',))
 
 class Parcoursup:
+    """
+    Classe qui fournit des méthodes d'extraction des données de Parcoursup.
+
+    Cette classe utilise les modules requests et BeautifulSoup4 pour se
+    connecter au site web de Parcoursup, analyser les pages HTML du
+    site, et extraire les informations qui nous intéressent.
+
+    On utilise un compte dédié créé sur Parcoursup par l'administration
+    du lycée.
+    """
     def __init__(self):
         self.session = requests.Session()
 
@@ -46,6 +56,11 @@ class Parcoursup:
         return r
 
     def connect(self, user, password):
+        """
+        Identification sur Parcoursup
+
+        Cette méthode doit être appelée avant toute autre.
+        """
         auth_data = {
                 'g_ea_cod': user,
                 'g_ea_mot_pas': password,
@@ -54,6 +69,12 @@ class Parcoursup:
         self.session.post(self.purl('authentification'), auth_data)
 
     def disconnect(self):
+        """
+        Déconnexion de Parcoursup
+
+        Cette méthode ferme la session qui a été ouverte plus tôt lors
+        d'un appel à la méthode connect.
+        """
         self.dget('authentification?ACTION=2&sId=' + self.session.cookies.get('JSESSIONID'))
 
     # Prendre impérativement les mêmes valeurs que dans le modèle
@@ -69,11 +90,21 @@ class Parcoursup:
         )
 
     def get_etat_display(self, etat):
+        """
+        Retourne la chaine de caractères associé, dans la liste
+        ETAT_CHOICES, à la valeur numérique de l'état donné en
+        paramètre.
+        """
         for (key, val) in Parcoursup.ETAT_CHOICES:
             if key == etat:
                 return val
 
     def _url_classe_etat(self, classe, etat):
+        """
+        Étant donné une classe et l'état des candidats à rechercher,
+        cette fonction renvoie l'adresse de la page Parcoursup où
+        trouver ces candidats.
+        """
         etat_url = {Parcoursup.ETAT_OUI: 'prop_acc',
                 Parcoursup.ETAT_OUIMAIS: 'prop_acc_att',
                 Parcoursup.ETAT_DEMISSION: 'ref'}
@@ -85,12 +116,44 @@ class Parcoursup:
                 etat=etat_url[etat])
 
     def _trouve_colonnes(self, table_candidats, colonnes):
+        """
+        Détermine, sur une page donnée, les positions des colonnes à
+        partir de leurs libellés.
+
+        La méthode recupere_par_etat recherche ses informations dans les
+        différentes colonnes du tableau renvoyé par Parcoursup. Elle a
+        besoin pour cela de savoir dans quelle colonne se trouve quelle
+        information. Elle dispose pour cela de numéros de colonnes
+        (valeurs par défaut codées en dur). Cependant, Parcoursup ne
+        renvoie pas toujours les mêmes colonnes selon les situations
+        (par exemple, l'ordre d'appel est parfois affiché, parfois non).
+
+        Cette fonction regarde l'en-tête du tableau Parcoursup pour
+        déterminer, d'après les libellés, les positions des colonnes qui
+        nous intéressent.
+
+        Le paramètre table_candidats doit contenir le tableau des
+        candidats extrait de la page Parcoursup.
+
+        Le paramètre colonnes est un dictionnaire qui à chaque
+        identifiant de colonne associe une ParcoursupColonne. Le champ
+        position de cette ParcoursupColonne sera mis à jour si on trouve
+        le libellé correspondant.
+
+        La méthode renvoie un nouveau dictionnaire suivant le même
+        format, mais avec les positions mises à jour.
+        """
+        # On commence par extraire la liste de tous les libellés
+        # présents dans le tableau, que l'on stocke dans un dictionnaire
+        # qui à chaque libellé associe sa position.
         thead = table_candidats.find('thead')
         positions = {}
         for index, th in enumerate(thead.find_all('th')):
             if th.string:
                 positions[th.string.strip()] = index
 
+        # On met ensuite à jour les positions des colonnes données en
+        # paramètre lorsque l'on trouve le libellé correspondant.
         res = {}
         for col in colonnes:
             colonne = colonnes[col]
@@ -101,46 +164,127 @@ class Parcoursup:
         return res
 
     def recupere_par_etat(self, classe, etat, candidats={}):
+        """
+        Méthode qui récupère la liste des candidatures pour la classe
+        et l'état (égal à l'une des constantes ETAT_xxx) donnés en
+        paramètres.
+
+        Elle renvoie un dictionnaire qui à chaque numéro de candidat
+        associe une ParcoursupProposition construite à parties des
+        données Parcoursup.
+
+        Elle accepte un paramètre facultatif candidats, qui est un
+        dictionnaire qui contient déjà des propositions pour des
+        candidats. Dans ce cas, ce dictionnaire est modifié en ajoutant
+        les nouvelles propositions et est renvoyé à la fin de l'appel.
+        Seule la proposition avec le meilleur état est conservée pour
+        chaque candidat (un oui définitif est meilleur qu'un oui avec
+        attente, qui est meilleur qu'une démission).
+        """
         html = self.session.get(self._url_classe_etat(classe, etat))
         soup = bs4.BeautifulSoup(html.text, 'html.parser')
         table_candidats = soup.find('table', {'id': 'listeCandidats'})
         tbody = table_candidats.find('tbody')
 
+        # Chaque entrée du tableau Parcoursup est une balise HTML <td>. On
+        # se donne un jeu de parsers qui convertissent, selon le type de
+        # colonne que l'on attend, le contenu de la balise (qui est une
+        # chaine de caractères) en un type Python.
+
         def parser_default(td):
+            """
+            Parser par défaut qui renvoie simplement le texte de la
+            colonne, auquel on retire les caractères d'espacement
+            parasites au début et à la fin.
+            """
             return td.contents[0].strip()
 
         def parser_nom(td):
+            """
+            Parcoursup met dans la même colonne le nom et le prénom de
+            chaque candidat. Ce parser extrait le nom de famille en
+            utilisant le fait que Parcoursup le met entièrement en
+            majuscules.
+            """
             nom_parts = []
             for part in parser_default(td).split():
+                # En fait, on regarde uniquement si la deuxième lettre
+                # du mot est une majuscule.
                 if len(part) > 1 and part[1].isupper():
                     nom_parts.append(part)
             return ' '.join(nom_parts)
 
         def parser_prenom(td):
+            """
+            Parcoursup met dans la même colonne le nom et le prénom de
+            chaque candidat. Ce parser extrait le prénom utilisant le
+            fait que Parcoursup met uniquement la première lettre du
+            prénom en majuscule.
+            """
             prenom_parts = []
             for part in parser_default(td).split():
+                # On teste en fait uniquement si la deuxième lettre est
+                # une minuscule.
                 if len(part) > 1 and part[1].islower():
                     prenom_parts.append(part)
             return ' '.join(prenom_parts)
 
+        # Une date et heure est ambigüe si elle n'est pas stockée avec
+        # l'indication du fuseau horaire correspondant. Les heures de
+        # Parcoursup sont à l'heure légale française. On prépare le
+        # fuseau horaire pour l'attacher ensuite aux heures que l'on
+        # récupèrera sur le site web.
         paris_tz = gettz('Europe/Paris')
+
         def parser_date_reponse(td):
+            """
+            Transformation du texte donnant la date de réponse en un
+            objet datetime.datetime Python.
+            """
+            # La fonction strptime() interprète le motif "%b" comme
+            # étant le nom du mois en toutes lettres. Elle doit pour
+            # cela savoir dans quelle langue on travaille. On force
+            # temporairement le changement de locale pour travailler en
+            # français.
             old_loc = locale.getlocale(locale.LC_TIME)
             locale.setlocale(locale.LC_TIME, 'fr_FR.UTF-8')
             date = datetime.datetime.strptime(parser_default(td),
                         "%d %b %Y %H:%M").replace(tzinfo=paris_tz)
+            # On remet la locale à son ancienne valeur pour ne pas
+            # risquer de perturber le reste du monde.
             locale.setlocale(locale.LC_TIME, old_loc)
             return date
 
         def parser_date_proposition(td):
+            """
+            Transformation du texte donnant la date de proposition en un
+            objet datetime.datetime Python.
+
+            Parcoursup ne précise ni l'heure de proposition, ni l'année.
+            On choisit minuit pour l'heure, et l'année en cours au
+            moment de l'exécution de la méthode.
+            """
+            # La fonction strptime() interprète le motif "%b" comme
+            # étant le nom du mois en toutes lettres. Elle doit pour
+            # cela savoir dans quelle langue on travaille. On force
+            # temporairement le changement de locale pour travailler en
+            # français.
             old_loc = locale.getlocale(locale.LC_TIME)
             locale.setlocale(locale.LC_TIME, 'fr_FR.UTF-8')
             date = datetime.datetime.strptime(parser_default(td),
                         "%d %b").replace(year=datetime.date.today().year,
                                 tzinfo=paris_tz)
+            # On remet la locale à son ancienne valeur pour ne pas
+            # risquer de perturber le reste du monde.
             locale.setlocale(locale.LC_TIME, old_loc)
             return date
 
+        # Liste des colonnes que l'on va rechercher pour chaque
+        # candidat. Les positions indiquées en dur correspondent à ce
+        # que je vois quand j'ouvre les pages avec mon navigateur, mais
+        # pas toujours à ce que Parcoursup renvoie lorsque l'on ouvre la
+        # page avec cette classe. La méthode _trouve_colonnes se charge
+        # donc de mettre à jour les positions en fonction des libellés.
         colonnes_psup = self._trouve_colonnes(table_candidats, {
                 'numero': ParcoursupColonne('numero', 'N° dossier', 3,
                     lambda c: int(parser_default(c))),
@@ -165,6 +309,13 @@ class Parcoursup:
                 'classe': ParcoursupColonne('classe', None, 0, lambda _: classe),
             })
 
+        # Mise à jour du dictionnaire des candidats avec toutes les
+        # propositions trouvées sur la page. Chaque proposition est dans
+        # une balise <tr>. Cependant, Parcoursup produit du code HTML
+        # comme il y a plus de 20 ans, et imbrique des tableaux dans des
+        # tableaux. L'argument "recursive=False" permet de n'attraper
+        # que les lignes du tableau actuel, pas les lignes des tableaux
+        # imbriqués plus profondément...
         for tr in tbody.find_all('tr', recursive=False):
             tds = tr.find_all('td', recursive=False)
 
@@ -180,4 +331,3 @@ class Parcoursup:
                 candidats[candidat.numero] = candidat
 
         return candidats
-
