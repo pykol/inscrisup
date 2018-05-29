@@ -92,12 +92,20 @@ class Etudiant(models.Model):
 
             # S'il y a lieu d'enregistrer de nouvelles actions, on le
             # fait immédiatement
-            if not old_prop.internat and nouv_prop.internat:
+            if not old_prop.internat and nouv_prop.internat and \
+                    not Action.objects.filter(statut=Action.STATUT_TODO,
+                            categorie=Action.ENVOI_DOSSIER,
+                            proposition__etudiant=self).exists():
                 Action(proposition=nouv_prop,
                         categorie=Action.ENVOI_DOSSIER_INTERNAT,
                         date=nouv_prop.date_proposition).save()
 
             if old_prop.internat and not nouv_prop.internat:
+                for action_envoi in Action.objects.filter(statut=Action.STATUT_TODO,
+                        categorie=Action.ENVOI_DOSSIER_INTERNAT,
+                        proposition__etudiant=self):
+                    action_envoi.annuler(nouv_prop_date.date_proposition)
+
                 Action(proposition=nouv_prop,
                         categorie=Action.INSCRIPTION,
                         date=nouv_prop.date_proposition,
