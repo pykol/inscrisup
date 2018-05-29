@@ -32,12 +32,28 @@ from .import_parcoursup import Parcoursup
 from .pdf_adresses import pdf_adresses
 
 def index(request):
-    classes = Classe.objects.all().annotate(
+    classe_list = Classe.objects.all().annotate(
             num_admis=Count('proposition',
                 filter=Q(proposition__date_demission__isnull=True,
                     proposition__remplacee_par__isnull=True)))
+    props_internat = Proposition.objects.filter(
+            remplacee_par__isnull=True,
+            date_demission__isnull=True,
+            internat=True
+            )
+
+    num_internat = props_internat.count()
+    num_internat_oui = \
+            props_internat.filter(statut=Proposition.STATUT_OUI).count()
+    num_internat_ouimais = \
+            props_internat.filter(statut=Proposition.STATUT_OUIMAIS).count()
+
     return render(request, 'parcoursup/index.html', context={
-        'classe_list': classes})
+        'classe_list': classe_list,
+        'num_internat': num_internat,
+        'num_internat_oui': num_internat_oui,
+        'num_internat_ouimais': num_internat_ouimais,
+        })
 
 class ClasseDetailView(generic.DetailView):
     model = Classe
