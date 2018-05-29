@@ -22,8 +22,12 @@ from collections import namedtuple
 import datetime
 from dateutil.tz import gettz
 import locale
+import tempfile
+import mmap
+
 import requests
 import bs4
+import xlrd
 
 ParcoursupProposition = namedtuple('ParcoursupProposition', ('numero',
     'nom', 'prenom', 'etat', 'message', 'internat', 'date_reponse',
@@ -331,3 +335,35 @@ class Parcoursup:
                 candidats[candidat.numero] = candidat
 
         return candidats
+
+    def fichier_admissions(self, classe):
+        """
+        Téléchargement du fichier d'admissions pour extraire les
+        adresses e-mail et postale.
+        """
+        base_url = 'https://gestion.parcoursup.fr/Gestion/admissions.fichiers?ACTION=19&cf_g_ta_cod={code_classe}&cf_g_ti_cod={code_classe}&cf_g_ti_flg_int=0&cf_g_ea_cod_aff={code_etablissement}&cf_g_ea_cod_ins={code_etablissement}'
+        url = base_url.format(code_classe=classe.code_parcoursup,
+                code_etablissement='0740003B')
+        xls_resp = self.session.get(url, stream=True)
+
+        xls_temp = tempfile.TemporaryFile()
+        for chunk in xls_resp.iter_content(chunk_size=128):
+            xls_temp.write(chunk)
+
+        xls_book = xlrd.open_workbook(
+                file_contents=mmap.mmap(xls_temp.fileno(), 0,
+                    access=mmap.ACCESS_READ))
+
+        xls_table = xls_book.sheet_by_index(0)
+
+        adresses = {}
+
+        for ligne in range(1, xls_table.nrows):
+            # TODO corriger les numéros de colonnes
+            numero = int(xls_table.cell(ligne, 0).value)
+            adresse = xls_table.cell(ligne, 12).value
+            email = xls_table.cell(ligne, 15).value
+
+            adresses[numero] = {'adresse': adresse, 'email': email}
+
+        return adresses

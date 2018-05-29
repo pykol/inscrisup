@@ -152,6 +152,13 @@ def parcoursup_auto_import(request):
         if classe.code_parcoursup > 0 and classe.groupe_parcoursup > 0:
             for (etat, _) in Parcoursup.ETAT_CHOICES:
                 psup.recupere_par_etat(classe, etat, candidats)
+
+    # Import des adresses des candidats depuis les fichiers d'admission
+    adresses = {}
+    #for classe in Classe.objects.all():
+    #    if classe.code_parcoursup > 0:
+    #        adresses.update(psup.fichier_admissions(classe))
+
     psup.disconnect()
 
     # Enregistrer les propositions en base de données
@@ -161,9 +168,13 @@ def parcoursup_auto_import(request):
         try:
             etudiant = Etudiant.objects.get(pk=numero)
         except Etudiant.DoesNotExist:
+            # On ignore simplement les étudiants démissionnaires qui
+            # n'étaient pas encore créés dans la base de données.
             if psup_prop.etat == Parcoursup.ETAT_DEMISSION:
                 continue
 
+            # Dans tous les autres cas, on importe l'étudiant quand il
+            # n'existe pas encore.
             etudiant = Etudiant(
                     dossier_parcoursup=numero,
                     nom=psup_prop.nom,
@@ -181,6 +192,13 @@ def parcoursup_auto_import(request):
             etudiant.nouvelle_proposition(proposition)
         else:
             etudiant.demission(psup_prop.date_reponse)
+
+    # Enregistrer les adresses des candidats
+    for numero in adresses:
+        etudiant = Etudiant.objects.get(pk=numero)
+        etudiant.adresse = adresses[etudiant]['adresse']
+        etudiant.email   = adresses[etudiant]['email']
+        etudiant.save()
 
     return redirect('index')
 
