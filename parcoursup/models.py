@@ -126,17 +126,21 @@ class Etudiant(models.Model):
         candidat.
         """
         proposition = self.proposition_actuelle
+        deja_demission = proposition.date_demission is not None
+
         proposition.date_demission = date
         proposition.save()
 
         actions = Action.objects.filter(statut=Action.STATUT_TODO,
-                proposition__etudiant=self)
+                proposition__etudiant=self).exclude(
+                        categorie=Action.DEMISSION)
         for action in actions:
             action.annuler(date)
 
-        Action(proposition=proposition,
-                categorie=Action.DEMISSION,
-                date=date).save()
+        if not deja_demission:
+            Action(proposition=proposition,
+                    categorie=Action.DEMISSION,
+                    date=date).save()
 
 class Classe(models.Model):
     nom = models.CharField(max_length=20)
