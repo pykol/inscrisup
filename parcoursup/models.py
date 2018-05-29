@@ -230,14 +230,14 @@ class Action(models.Model):
     def traiter(self, date):
         """Marque une action comme traitée à la date donnée"""
         if self.statut == Action.STATUT_TODO:
-            self.date = date
+            self.date_fait = date
             self.statut = Action.STATUT_FAIT
             self.save()
 
     def annuler(self, date):
         """Marque une action comme annulée à la date donnée"""
         if self.statut == Action.STATUT_TODO:
-            self.date = date
+            self.date_fait = date
             self.statut = Action.STATUT_ANNULEE
             self.save()
 
