@@ -86,7 +86,7 @@ class Parcoursup:
 
     def recupere_par_etat(self, classe, etat, candidats={}):
         html = self.session.get(self._url_classe_etat(classe, etat))
-        soup = bs4.BeautifulSoup(html.text, 'lxml')
+        soup = bs4.BeautifulSoup(html.text, 'html.parser')
         table_candidats = soup.find('table', {'id': 'listeCandidats'})
         tbody = table_candidats.find('tbody')
 
