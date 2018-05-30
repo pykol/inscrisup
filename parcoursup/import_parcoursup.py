@@ -23,11 +23,14 @@ import datetime
 from dateutil.tz import gettz
 import locale
 import tempfile
-import mmap
+import re
+import csv
+import os
 
 import requests
 import bs4
-import xlrd
+
+from .models import Etudiant
 
 ParcoursupProposition = namedtuple('ParcoursupProposition', ('numero',
     'nom', 'prenom', 'etat', 'message', 'internat', 'date_reponse',
@@ -344,26 +347,63 @@ class Parcoursup:
         base_url = 'https://gestion.parcoursup.fr/Gestion/admissions.fichiers?ACTION=19&cf_g_ta_cod={code_classe}&cf_g_ti_cod={code_classe}&cf_g_ti_flg_int=0&cf_g_ea_cod_aff={code_etablissement}&cf_g_ea_cod_ins={code_etablissement}'
         url = base_url.format(code_classe=classe.code_parcoursup,
                 code_etablissement='0740003B')
-        xls_resp = self.session.get(url, stream=True)
+        csv_resp = self.session.get(url, stream=True)
 
-        xls_temp = tempfile.TemporaryFile()
-        for chunk in xls_resp.iter_content(chunk_size=128):
-            xls_temp.write(chunk)
+        csv_temp = tempfile.TemporaryFile(mode='r+b')
+        for chunk in csv_resp.iter_content(chunk_size=128):
+            csv_temp.write(chunk)
 
-        xls_book = xlrd.open_workbook(
-                file_contents=mmap.mmap(xls_temp.fileno(), 0,
-                    access=mmap.ACCESS_READ))
-
-        xls_table = xls_book.sheet_by_index(0)
+        # Après l'écriture, csv_temp est placé à la fin du fichier. On
+        # se remet au début pour lire.
+        csv_temp.seek(0)
+        csv_temp_text = os.fdopen(csv_temp.fileno(), 'rt')
+        csv_file = csv.reader(csv_temp_text, delimiter=';')
 
         adresses = {}
 
-        for ligne in range(1, xls_table.nrows):
-            # TODO corriger les numéros de colonnes
-            numero = int(xls_table.cell(ligne, 0).value)
-            adresse = xls_table.cell(ligne, 12).value
-            email = xls_table.cell(ligne, 15).value
+        # On ignore la première ligne qui contient uniquement les
+        # en-têtes
+        next(csv_file)
 
-            adresses[numero] = {'adresse': adresse, 'email': email}
+        # On traite les adresses de chaque étudiant
+        date_re = re.compile(r'(?P<day>\d{1,2})/(?P<month>\d{1,2})/(?P<year>\d{4})$')
+        def parse_date(date):
+            match = date_re.match(date)
+            if match:
+                kw = {k: int(v) for k, v in match.groupdict().items()}
+                return datetime.date(**kw)
+
+        def format_adresse_pays(**parts):
+            default_france = "{adresse1}\n{adresse2}\n{code_postal} {ville}\n{pays}"
+            autre = "{adresse1}\n{adresse2}\n{code_postal}\n{ville}\n{pays}"
+
+            res = ""
+            if 'pays' in parts and parts['pays'] == "":
+                res = default_france.format(**parts)
+            else:
+                res = autre.format(**parts)
+            return re.sub(r'\n+', '\n', res)
+
+        for ligne in csv_file:
+            numero = int(ligne[0])
+
+            adresse = format_adresse_pays(
+                    adresse1 = ligne[6],
+                    adresse2 = ligne[7],
+                    code_postal = ligne[8],
+                    ville = ligne[9],
+                    pays = ligne[10])
+
+            email = ligne[21]
+
+            if ligne[2] == 'M.':
+                sexe = Etudiant.SEXE_HOMME
+            else:
+                sexe = Etudiant.SEXE_FEMME
+
+            date_naissance = parse_date(ligne[5])
+
+            adresses[numero] = {'adresse': adresse, 'email': email,
+                    'sexe': sexe, 'date_naissance': date_naissance}
 
         return adresses

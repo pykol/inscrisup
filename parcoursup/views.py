@@ -155,9 +155,9 @@ def parcoursup_auto_import(request):
 
     # Import des adresses des candidats depuis les fichiers d'admission
     adresses = {}
-    #for classe in Classe.objects.all():
-    #    if classe.code_parcoursup > 0:
-    #        adresses.update(psup.fichier_admissions(classe))
+    for classe in Classe.objects.all():
+        if classe.code_parcoursup > 0:
+            adresses.update(psup.fichier_admissions(classe))
 
     psup.disconnect()
 
@@ -195,10 +195,7 @@ def parcoursup_auto_import(request):
 
     # Enregistrer les adresses des candidats
     for numero in adresses:
-        etudiant = Etudiant.objects.get(pk=numero)
-        etudiant.adresse = adresses[etudiant]['adresse']
-        etudiant.email   = adresses[etudiant]['email']
-        etudiant.save()
+        Etudiant.objects.filter(pk=numero).update(**adresses[numero])
 
     return redirect('index')
 
