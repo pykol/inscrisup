@@ -211,3 +211,11 @@ def export_pdf_adresses(request):
     pdf_adresses(actions, response)
 
     return response
+
+def internat_detail(request):
+    etudiant_list = Etudiant.objects.filter(
+            proposition_actuelle__internat=True,
+            proposition_actuelle__remplacee_par__isnull=True,
+            proposition_actuelle__date_demission__isnull=True)
+    return render(request, 'parcoursup/internat_detail.html',
+            context={'etudiant_list': etudiant_list})
