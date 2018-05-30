@@ -24,9 +24,9 @@ from reportlab.pdfgen import canvas
 
 def pdf_adresses(actions, fileout):
     c = canvas.Canvas(fileout)
-    pos_left = 11 * cm
-    pos_bottom = 24 * cm
-    interligne = 0.7 * cm
+    pos_left = 11.5 * cm
+    pos_bottom = 25.3 * cm
+    interligne = 0.6 * cm
     for action in actions:
         etudiant = action.proposition.etudiant
         c.drawString(pos_left, pos_bottom, str(etudiant))
