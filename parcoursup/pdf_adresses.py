@@ -29,7 +29,7 @@ def pdf_adresses(actions, fileout):
     interligne = 0.6 * cm
     for action in actions:
         etudiant = action.proposition.etudiant
-        c.drawString(pos_left, pos_bottom, str(etudiant))
+        c.drawString(pos_left, pos_bottom, etudiant.civilite() + " " + str(etudiant))
         bot_actuel = pos_bottom - interligne
         lignes_adresse = str(etudiant.adresse).split("\n")
         for ligne in lignes_adresse:
