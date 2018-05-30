@@ -7,7 +7,7 @@
   <tr>
     <td><i class="fas fa-home"></i>Adresse</td>
     <td>{% if etudiant.adresse %}
-      {{ etudiant.adresse }}
+      {{ etudiant.adresse|linebreaks }}
       {% else %}
       L'adresse n'a pas pu être encore obtenue depuis Parcoursup.
       {% endif %}
