@@ -16,7 +16,7 @@
   <tr>
     <td><i class="fas fa-at"></i>E-mail</td>
     <td>{% if etudiant.email %}
-      <a href="mailto:{{ etudiant.adresse }}">{{ etudiant.adresse }}</a>
+      <a href="mailto:{{ etudiant.email }}">{{ etudiant.email }}</a>
       {% else %}
       L'e-mail n'a pas pu être encore obtenu depuis Parcoursup.
       {% endif %}
