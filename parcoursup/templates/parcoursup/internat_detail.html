@@ -2,6 +2,30 @@
 {% block main %}
 <h2>Internat</h2>
 
+<table>
+  <tr>
+    <th>Hommes</th>
+    <td>{{ num_hommes }}</td>
+  </tr>
+  <tr>
+    <th>Femmes</th>
+    <td>{{ num_femmes }}</td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    {% for classe, _ in par_classe.items %}
+    <th>{{ classe }}</th>
+    {% endfor %}
+  </tr>
+  <tr>
+    {% for _, num in par_classe.items %}
+    <th>{{ num }}</th>
+    {% endfor %}
+  </tr>
+</table>
+
 <h3>Propositions d'admission</h3>
 <table>
   <tr>

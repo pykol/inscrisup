@@ -214,5 +214,23 @@ def internat_detail(request):
             proposition_actuelle__internat=True,
             proposition_actuelle__remplacee_par__isnull=True,
             proposition_actuelle__date_demission__isnull=True)
+
+    num_hommes = etudiant_list.filter(sexe=Etudiant.SEXE_HOMME).count()
+    num_femmes = etudiant_list.filter(sexe=Etudiant.SEXE_FEMME).count()
+
+    par_classe_qs = \
+            etudiant_list.values('proposition_actuelle__classe').annotate(Count('dossier_parcoursup'))
+
+    par_classe = {}
+    for item in par_classe_qs:
+        classe = Classe.objects.get(pk=item['proposition_actuelle__classe'])
+        num = item['dossier_parcoursup__count']
+        par_classe[classe] = num
+
     return render(request, 'parcoursup/internat_detail.html',
-            context={'etudiant_list': etudiant_list})
+            context={
+                'etudiant_list': etudiant_list,
+                'num_hommes': num_hommes,
+                'num_femmes': num_femmes,
+                'par_classe': par_classe,
+                })
