@@ -40,6 +40,15 @@ class Etudiant(models.Model):
     proposition_actuelle = models.ForeignKey('Proposition', blank=True,
             null=True, related_name='+', on_delete=models.SET_NULL)
 
+    SEXE_HOMME=1
+    SEXE_FEMME=2
+    SEXE_CHOICES = (
+            (SEXE_HOMME, 'M.'),
+            (SEXE_FEMME, 'Mme'),
+        )
+    sexe = models.SmallIntegerField(choices=SEXE_CHOICES, blank=True,
+            null=True)
+
     objects = EtudiantManager()
 
     def __str__(self):
@@ -47,6 +56,13 @@ class Etudiant(models.Model):
 
     def get_absolute_url(self):
         return reverse('etudiant.details', args=[str(self.pk),])
+
+    def civilite(self):
+        if self.sexe:
+            if self.sexe == Etudiant.SEXE_HOMME:
+                return 'M.'
+            else:
+                return 'Mme'
 
     class Meta:
         verbose_name = "étudiant"
