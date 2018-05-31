@@ -25,12 +25,14 @@ from django.http import HttpResponse
 from django.views import generic
 from django.urls import reverse
 from django.db.models import Count, Q
+from django.contrib.auth.decorators import login_required
 
 from .models import Classe, Etudiant, Action, Proposition
 from .forms import PropositionForm, ParcoursupImportForm
 from .import_parcoursup import Parcoursup
 from .pdf_adresses import pdf_adresses
 
+@login_required
 def index(request):
     classe_list = Classe.objects.all().annotate(
             num_admis=Count('proposition',
