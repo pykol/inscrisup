@@ -356,7 +356,7 @@ class Parcoursup:
         # Après l'écriture, csv_temp est placé à la fin du fichier. On
         # se remet au début pour lire.
         csv_temp.seek(0)
-        csv_temp_text = os.fdopen(csv_temp.fileno(), 'rt')
+        csv_temp_text = open(csv_temp.fileno(), 'rt', encoding='utf-8')
         csv_file = csv.reader(csv_temp_text, delimiter=';')
 
         adresses = {}
