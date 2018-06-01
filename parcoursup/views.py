@@ -26,6 +26,7 @@ from django.views import generic
 from django.urls import reverse
 from django.db.models import Count, Q
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 from .models import Classe, Etudiant, Action, Proposition
 from .forms import PropositionForm, ParcoursupImportForm
@@ -57,12 +58,13 @@ def index(request):
         'num_internat_ouimais': num_internat_ouimais,
         })
 
-class ClasseDetailView(generic.DetailView):
+class ClasseDetailView(LoginRequiredMixin, generic.DetailView):
     model = Classe
 
-class EtudiantDetailView(generic.DetailView):
+class EtudiantDetailView(LoginRequiredMixin, generic.DetailView):
     model = Etudiant
 
+@login_required
 def proposition_ajout(request):
     if request.method == 'POST':
         form = PropositionForm(request.POST)
@@ -83,23 +85,26 @@ def proposition_ajout(request):
                 'form': form,
             })
 
+@login_required
 def etudiant_demission(request, pk):
     etudiant = get_object_or_404(Etudiant, pk=pk)
     etudiant.demission(datetime.datetime.now())
 
     return redirect('etudiant.details', pk=etudiant.pk)
 
-class ActionTodoListView(generic.ListView):
+class ActionTodoListView(LoginRequiredMixin, generic.ListView):
     queryset = Action.objects.filter(statut = Action.STATUT_TODO)
 
-class ActionDetailView(generic.DetailView):
+class ActionDetailView(LoginRequiredMixin, generic.DetailView):
     model = Action
 
+@login_required
 def action_traiter(request, pk):
     action = get_object_or_404(Action, pk=pk)
     action.traiter(datetime.datetime.now())
     return redirect('action.liste')
 
+@login_required
 def parcoursup_import(request):
     if request.method == 'POST':
         form = ParcoursupImportForm(request.POST, request.FILES)
@@ -144,6 +149,7 @@ def parcoursup_import(request):
                 'form': form,
             })
 
+@login_required
 def parcoursup_auto_import(request):
     psup = Parcoursup()
     psup.connect('utilisateur_parcoursup', 'mot_de_passe')
@@ -201,6 +207,7 @@ def parcoursup_auto_import(request):
 
     return redirect('index')
 
+@login_required
 def export_pdf_adresses(request):
     actions = Action.objects.filter(statut=Action.STATUT_TODO,
             categorie__in=(Action.ENVOI_DOSSIER,
@@ -211,6 +218,7 @@ def export_pdf_adresses(request):
 
     return response
 
+@login_required
 def internat_detail(request):
     etudiant_list = Etudiant.objects.filter(
             proposition_actuelle__internat=True,
