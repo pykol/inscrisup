@@ -209,12 +209,13 @@ def parcoursup_auto_import(request):
 
 @login_required
 def export_pdf_adresses(request):
-    actions = Action.objects.filter(statut=Action.STATUT_TODO,
-            categorie__in=(Action.ENVOI_DOSSIER,
+    etudiants = Etudiant.objects.filter(
+            proposition__action__statut=Action.STATUT_TODO,
+            proposition__action__categorie__in=(Action.ENVOI_DOSSIER,
                 Action.ENVOI_DOSSIER_INTERNAT))
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = 'attachment; filename="adresses_parcoursup.pdf"'
-    pdf_adresses(actions, response)
+    pdf_adresses(etudiants, response)
 
     return response
 

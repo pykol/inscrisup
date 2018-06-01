@@ -22,13 +22,12 @@ from reportlab.lib.pagesizes import A4
 from reportlab.lib.units import cm
 from reportlab.pdfgen import canvas
 
-def pdf_adresses(actions, fileout):
+def pdf_adresses(etudiants, fileout):
     c = canvas.Canvas(fileout)
     pos_left = 11.5 * cm
     pos_bottom = 25.3 * cm
     interligne = 0.6 * cm
-    for action in actions:
-        etudiant = action.proposition.etudiant
+    for etudiant in etudiants:
         c.drawString(pos_left, pos_bottom, etudiant.civilite() + " " + str(etudiant))
         bot_actuel = pos_bottom - interligne
         lignes_adresse = str(etudiant.adresse).split("\n")
