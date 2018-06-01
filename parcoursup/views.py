@@ -220,6 +220,28 @@ def export_pdf_adresses(request):
     return response
 
 @login_required
+def export_pdf_adresses_definitif(request):
+    etudiants = Etudiant.objects.filter(
+            proposition__statut=Proposition.STATUT_OUI,
+            proposition__action__statut=Action.STATUT_TODO,
+            proposition__action__categorie__in=(Action.ENVOI_DOSSIER,
+                Action.ENVOI_DOSSIER_INTERNAT))
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="adresses_parcoursup.pdf"'
+    pdf_adresses(etudiants, response)
+
+    return response
+
+@login_required
+def export_pdf_adresse_etudiant(request, pk):
+    etudiant = Etudiant.objects.filter(pk=pk)
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="adresses_parcoursup.pdf"'
+    pdf_adresses(etudiant, response)
+
+    return response
+
+@login_required
 def internat_detail(request):
     etudiant_list = Etudiant.objects.filter(
             proposition_actuelle__internat=True,

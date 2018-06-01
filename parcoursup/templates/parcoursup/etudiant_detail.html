@@ -8,6 +8,8 @@
     <td><i class="fas fa-home"></i>Adresse</td>
     <td>{% if etudiant.adresse %}
       {{ etudiant.adresse|linebreaks }}
+      <br>
+      <a href="{% url 'etudiant.pdf_adresse' etudiant.pk %}">Imprimer l'adresse</a>
       {% else %}
       L'adresse n'a pas pu être encore obtenue depuis Parcoursup.
       {% endif %}

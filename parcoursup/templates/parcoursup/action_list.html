@@ -10,7 +10,9 @@
 <h2>{{ action_count }} actions à réaliser</h2>
 {% endblocktrans %}
 <p><a href="{% url 'action.export_pdf_adresses' %}"><i class="fas
-fa-print"></i>Imprimer les adresses</a></p>
+fa-print"></i>Imprimer toutes les adresses</a></p>
+<p><a href="{% url 'action.export_pdf_adresses_definitif' %}"><i class="fas
+fa-print"></i>Imprimer les adresses des oui définitifs</a></p>
 <table>
   <tr>
     <th>Classe</th>

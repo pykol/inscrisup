@@ -27,6 +27,7 @@ urlpatterns = [
     url(r'^classe/(?P<slug>[-\w]+)/$', views.ClasseDetailView.as_view(), name='classe.details'),
     url(r'^internat/$', views.internat_detail, name='internat.details'),
     url(r'^etudiant/(?P<pk>[0-9]+)/$', views.EtudiantDetailView.as_view(), name='etudiant.details'),
+    url(r'^etudiant/(?P<pk>[0-9]+)/pdf_adresse$', views.export_pdf_adresse_etudiant, name='etudiant.pdf_adresse'),
     url(r'^etudiant/(?P<pk>[0-9]+)/demission$', views.etudiant_demission, name='etudiant.demission'),
     url(r'^proposition/ajout/$', views.proposition_ajout, name='proposition.ajout'),
     url(r'^proposition/import/$', views.parcoursup_import, name='proposition.parcoursup_import'),
@@ -35,4 +36,5 @@ urlpatterns = [
     url(r'^action/(?P<pk>[0-9]+)/$', views.ActionDetailView.as_view(), name='action.details'),
     url(r'^action/(?P<pk>[0-9]+)/traiter$', views.action_traiter, name='action.traiter'),
     url(r'^action/pdf_adresses/$', views.export_pdf_adresses, name='action.export_pdf_adresses'),
+    url(r'^action/pdf_adresses/definitif$', views.export_pdf_adresses_definitif, name='action.export_pdf_adresses_definitif'),
 ]
