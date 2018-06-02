@@ -61,6 +61,12 @@ def index(request):
 class ClasseDetailView(LoginRequiredMixin, generic.DetailView):
     model = Classe
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        classe = self.get_object()
+        context['etudiant_list'] = classe.admissions().order_by('nom')
+        return context
+
 class EtudiantDetailView(LoginRequiredMixin, generic.DetailView):
     model = Etudiant
 
