@@ -278,9 +278,12 @@ class Parcoursup:
             # français.
             old_loc = locale.getlocale(locale.LC_TIME)
             locale.setlocale(locale.LC_TIME, 'fr_FR.UTF-8')
-            date = datetime.datetime.strptime(parser_default(td),
+            try:
+                date = datetime.datetime.strptime(parser_default(td),
                         "%d %b").replace(year=datetime.date.today().year,
                                 tzinfo=paris_tz)
+            except ValueError:
+                date = None
             # On remet la locale à son ancienne valeur pour ne pas
             # risquer de perturber le reste du monde.
             locale.setlocale(locale.LC_TIME, old_loc)
