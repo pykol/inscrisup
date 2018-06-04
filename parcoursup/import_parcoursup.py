@@ -255,8 +255,11 @@ class Parcoursup:
             # français.
             old_loc = locale.getlocale(locale.LC_TIME)
             locale.setlocale(locale.LC_TIME, 'fr_FR.UTF-8')
-            date = datetime.datetime.strptime(parser_default(td),
+            try:
+                date = datetime.datetime.strptime(parser_default(td),
                         "%d %b %Y %H:%M").replace(tzinfo=paris_tz)
+            except ValueError:
+                date = None
             # On remet la locale à son ancienne valeur pour ne pas
             # risquer de perturber le reste du monde.
             locale.setlocale(locale.LC_TIME, old_loc)
@@ -267,6 +270,11 @@ class Parcoursup:
             Transformation du texte donnant la date de proposition en un
             objet datetime.datetime Python.
 
+            Parcoursup utilise de temps à autre deux formats différents
+            pour cette colonne, soit en indiquant uniquement le jour et
+            le mois, soit en indiquant la date complète avec l'heure.
+
+            On tente les deux formats. Quand il s'agit du premier,
             Parcoursup ne précise ni l'heure de proposition, ni l'année.
             On choisit minuit pour l'heure, et l'année en cours au
             moment de l'exécution de la méthode.
@@ -283,7 +291,7 @@ class Parcoursup:
                         "%d %b").replace(year=datetime.date.today().year,
                                 tzinfo=paris_tz)
             except ValueError:
-                date = None
+                date = parser_date_reponse(td)
             # On remet la locale à son ancienne valeur pour ne pas
             # risquer de perturber le reste du monde.
             locale.setlocale(locale.LC_TIME, old_loc)
