@@ -100,7 +100,7 @@ def etudiant_demission(request, pk):
 
 class ActionTodoListView(LoginRequiredMixin, generic.ListView):
     queryset = Action.objects.filter(
-            statut = Action.STATUT_TODO).order_by('-proposition__statut', 'date')
+            statut = Action.STATUT_TODO).order_by('proposition__statut', 'date')
 
 class ActionDetailView(LoginRequiredMixin, generic.DetailView):
     model = Action
