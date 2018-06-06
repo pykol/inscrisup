@@ -20,13 +20,14 @@ from __future__ import unicode_literals
 
 from collections import namedtuple
 import datetime
-from dateutil.tz import gettz
 import locale
 import tempfile
 import re
 import csv
 import os
 
+from django.conf import settings
+from dateutil.tz import gettz
 import requests
 import bs4
 
@@ -421,7 +422,7 @@ class Parcoursup:
 
 def auto_import():
     psup = Parcoursup()
-    psup.connect('utilisateur_parcoursup', 'mot_de_passe')
+    psup.connect(settings.PARCOURSUP_USER, settings.PARCOURSUP_PASS)
 
     # Import des propositions d'admission depuis Parcoursup
     candidats = {}

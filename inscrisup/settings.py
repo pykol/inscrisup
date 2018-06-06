@@ -121,3 +121,8 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 LOGIN_REDIRECT_URL = 'index'
+
+
+# Connexion à Parcoursup
+PARCOURSUP_USER = 'utilisateur_parcoursup'
+PARCOURSUP_PASS = 'mot_de_passe_parcoursup'
