@@ -17,11 +17,10 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 from django.core.management.base import BaseCommand, CommandError
-from parcoursup.models import 
 
 class Command(BaseCommand):
     help = "Mettre à jour les propositions d'admission depuis Parcoursup"
 
     def handle(self, *args, **kwargs):
-        from .import_parcoursup import auto_import
+        from parcoursup.import_parcoursup import auto_import
         auto_import()
