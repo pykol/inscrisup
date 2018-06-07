@@ -41,6 +41,28 @@
           <td>{{ num_internat }}</td>
         </tr>
       </table>
+
+      <h2>Synchronisations</h2>
+      <p>Liste des dernières tentatives (réussies ou non) de
+      synchronisation des données depuis le site Parcoursup. Des
+      synchronisations automatiques sont lancées périodiquement. Dans le
+      menu de gauche, il est possible de demander une synchronisation
+      manuelle immédiate.</p>
+      <table>
+        <tr>
+          <th>Début</th>
+          <th>Fin</th>
+          <th>Résultat</th>
+          <th>Mode</th>
+        </tr>
+        {% for synchro in synchro_list %}
+        <tr>
+          <td>{{ synchro.date_debut }}</td>
+          <td>{{ synchro.date_fin }}</td>
+          <td>{{ synchro.get_resultat_display }}</td>
+          <td>{{ synchro.get_mode_display }}</td>
+        {% endfor %}
+      </table>
       {% endblock %}
     </section>
 

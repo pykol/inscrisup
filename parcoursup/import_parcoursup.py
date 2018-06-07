@@ -27,11 +27,12 @@ import csv
 import os
 
 from django.conf import settings
+from django.utils import timezone
 from dateutil.tz import gettz
 import requests
 import bs4
 
-from .models import Etudiant, Proposition, Classe
+from .models import Etudiant, Proposition, Classe, ParcoursupSynchro
 
 ParcoursupProposition = namedtuple('ParcoursupProposition', ('numero',
     'nom', 'prenom', 'etat', 'message', 'internat', 'date_reponse',
@@ -420,7 +421,9 @@ class Parcoursup:
 
         return adresses
 
-def auto_import():
+def unsafe_auto_import():
+    date_debut = timezone.now()
+
     psup = Parcoursup()
     psup.connect(settings.PARCOURSUP_USER, settings.PARCOURSUP_PASS)
 
@@ -474,3 +477,18 @@ def auto_import():
     # Enregistrer les adresses des candidats
     for numero in adresses:
         Etudiant.objects.filter(pk=numero).update(**adresses[numero])
+
+def auto_import(mode=ParcoursupSynchro.MODE_MANUEL):
+    # Sauvegarde de l'heure de début, pour l'historique
+    date_debut = timezone.now()
+
+    try:
+        unsafe_auto_import()
+        resultat = ParcoursupSynchro.RESULTAT_OK
+    except:
+        resultat = ParcoursupSynchro.RESULTAT_ERREUR
+
+    date_fin = timezone.now()
+
+    ParcoursupSynchro(date_debut=date_debut, date_fin=date_fin,
+            mode=mode, resultat=resultat).save()

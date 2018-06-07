@@ -260,3 +260,24 @@ class Action(models.Model):
     def est_envoi(self):
         return self.categorie in [Action.ENVOI_DOSSIER,
                 Action.ENVOI_DOSSIER_INTERNAT,]
+
+class ParcoursupSynchro(models.Model):
+    date_debut = models.DateTimeField(verbose_name="début")
+    date_fin = models.DateTimeField(verbose_name="fin")
+
+    MODE_AUTO = 1
+    MODE_MANUEL = 2
+    MODE_CHOICES = (
+            (MODE_AUTO, "Automatique"),
+            (MODE_MANUEL, "Manuelle"),
+        )
+    mode = models.SmallIntegerField(choices=MODE_CHOICES)
+
+    RESULTAT_OK = 1
+    RESULTAT_ERREUR = 2
+    RESULTAT_CHOICES = (
+            (RESULTAT_OK, "Réussie"),
+            (RESULTAT_ERREUR, "Échec"),
+        )
+    resultat = models.SmallIntegerField(verbose_name="résultat",
+            choices=RESULTAT_CHOICES, blank=True, null=True)

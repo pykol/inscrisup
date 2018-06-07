@@ -50,11 +50,14 @@ def index(request):
     num_internat_ouimais = \
             props_internat.filter(statut=Proposition.STATUT_OUIMAIS).count()
 
+    synchro_list = ParcoursupSynchro.objects.all().order_by('date_debut')[:5]
+
     return render(request, 'parcoursup/index.html', context={
         'classe_list': classe_list,
         'num_internat': num_internat,
         'num_internat_oui': num_internat_oui,
         'num_internat_ouimais': num_internat_ouimais,
+        'synchro_list': synchro_list,
         })
 
 class ClasseDetailView(LoginRequiredMixin, generic.DetailView):
