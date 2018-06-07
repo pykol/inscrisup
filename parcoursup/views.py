@@ -28,7 +28,8 @@ from django.db.models import Count, Q
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 
-from .models import Classe, Etudiant, Action, Proposition
+from .models import Classe, Etudiant, Action, Proposition, \
+        ParcoursupSynchro
 from .forms import PropositionForm, ParcoursupImportForm
 from .pdf_adresses import pdf_adresses
 
