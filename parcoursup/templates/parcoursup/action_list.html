@@ -9,10 +9,25 @@
 {% plural %}
 <h2>{{ action_count }} actions à réaliser</h2>
 {% endblocktrans %}
-<p><a href="{% url 'action.export_pdf_adresses' %}"><i class="fas
-fa-print"></i>Imprimer toutes les adresses</a></p>
-<p><a href="{% url 'action.export_pdf_adresses_definitif' %}"><i class="fas
-fa-print"></i>Imprimer les adresses des oui définitifs</a></p>
+<p>À chaque fois qu'un changement concernant un candidat est détecté sur
+Parcoursup (acceptation d'une nouvelle proposition, changement de
+classe, démission d'une proposition précédemment acceptée, etc.), une
+action est ajoutée dans la liste suivante.</p>
+<p>Lorsque vous avez réalisé une action donnée, cliquez que le lien
+<em>Traiter</em> à droite de l'action. Elle sera alors retirée de la
+liste.</p>
+
+<p>Pour faciliter l'envoi des dossiers, vous pouvez imprimer l'un des
+deux documents suivants. Ils contiennent les adresses des étudiants,
+chacune placée sur une page de garde à l'emplacement de la fenêtre de
+l'enveloppe.
+<ul>
+  <li><a href="{% url 'action.export_pdf_adresses' %}"><i class="fas
+  fa-print"></i>Imprimer toutes les adresses</a></li>
+  <li><a href="{% url 'action.export_pdf_adresses_definitif' %}"><i class="fas
+  fa-print"></i>Imprimer les adresses des oui définitifs</a></li>
+</ul>
+
 <table>
   <tr>
     <th>Classe</th>
