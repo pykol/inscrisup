@@ -24,7 +24,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse
 from django.views import generic
 from django.urls import reverse
-from django.db.models import Count, Q
+from django.db.models import Count, Q, F
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 
@@ -51,7 +51,8 @@ def index(request):
     num_internat_ouimais = \
             props_internat.filter(statut=Proposition.STATUT_OUIMAIS).count()
 
-    synchro_list = ParcoursupSynchro.objects.all().order_by('-date_debut')[:5]
+    synchro_list = ParcoursupSynchro.objects.all().order_by('-date_debut')[:5].annotate(duree=F('date_fin')
+            - F('date_debut'))
 
     return render(request, 'parcoursup/index.html', context={
         'classe_list': classe_list,

@@ -1,5 +1,6 @@
 {% load static %}
 {% load navigation %}
+{% load humanize %}
 <!DOCTYPE html>
 <html lang="fr">
   <head>
@@ -51,14 +52,14 @@
       <table>
         <tr>
           <th>Début</th>
-          <th>Fin</th>
+          <th>Durée</th>
           <th>Résultat</th>
           <th>Mode</th>
         </tr>
         {% for synchro in synchro_list %}
         <tr>
-          <td>{{ synchro.date_debut }}</td>
-          <td>{{ synchro.date_fin }}</td>
+          <td>{{ synchro.date_debut|naturaltime }}</td>
+          <td>{{ synchro.duree }}</td>
           <td>{{ synchro.get_resultat_display }}</td>
           <td>{{ synchro.get_mode_display }}</td>
         {% endfor %}
