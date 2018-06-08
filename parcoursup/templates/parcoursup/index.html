@@ -1,6 +1,7 @@
 {% load static %}
 {% load navigation %}
 {% load humanize %}
+{% load psup_humanize %}
 <!DOCTYPE html>
 <html lang="fr">
   <head>
@@ -59,7 +60,7 @@
         {% for synchro in synchro_list %}
         <tr>
           <td>{{ synchro.date_debut|naturaltime }}</td>
-          <td>{{ synchro.duree }}</td>
+          <td>{{ synchro.duree|smooth_timedelta }}</td>
           <td>{{ synchro.get_resultat_display }}</td>
           <td>{{ synchro.get_mode_display }}</td>
         {% endfor %}
