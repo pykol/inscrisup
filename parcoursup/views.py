@@ -172,7 +172,7 @@ def export_pdf_adresses(request):
     etudiants = Etudiant.objects.filter(
             proposition__action__statut=Action.STATUT_TODO,
             proposition__action__categorie__in=(Action.ENVOI_DOSSIER,
-                Action.ENVOI_DOSSIER_INTERNAT))
+                Action.ENVOI_DOSSIER_INTERNAT)).order_by('nom')
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = 'attachment; filename="adresses_parcoursup.pdf"'
     pdf_adresses(etudiants, response)
