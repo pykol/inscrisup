@@ -422,8 +422,6 @@ class Parcoursup:
         return adresses
 
 def unsafe_auto_import():
-    date_debut = timezone.now()
-
     psup = Parcoursup()
     psup.connect(settings.PARCOURSUP_USER, settings.PARCOURSUP_PASS)
 
