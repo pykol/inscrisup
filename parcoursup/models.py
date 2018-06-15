@@ -106,8 +106,18 @@ class Etudiant(models.Model):
             old_prop.date_demission = nouv_prop.date_proposition
             old_prop.save()
 
+            # On rattache toutes les actions d'envoi pas encore traitées
+            # à la proposition actuelle
+            Actions.objects.filter(statut=Action.STATUT_TODO,
+                    categorie__in=(Action.ENVOI_DOSSIER,
+                        Action.ENVOI_DOSSIER_INTERNAT),
+                    proposition__etudiant=self).update(proposition=nouv_prop)
+
             # S'il y a lieu d'enregistrer de nouvelles actions, on le
             # fait immédiatement
+
+            # Envoi du dossier complémentaire d'internat si le reste du
+            # dossier a déjà été envoyé
             if not old_prop.internat and nouv_prop.internat and \
                     not Action.objects.filter(statut=Action.STATUT_TODO,
                             categorie=Action.ENVOI_DOSSIER,
@@ -116,6 +126,8 @@ class Etudiant(models.Model):
                         categorie=Action.ENVOI_DOSSIER_INTERNAT,
                         date=nouv_prop.date_proposition).save()
 
+            # Si l'étudiant a renoncé à l'internat, on retire les envois
+            # de dossier d'internat
             if old_prop.internat and not nouv_prop.internat:
                 for action_envoi in Action.objects.filter(statut=Action.STATUT_TODO,
                         categorie=Action.ENVOI_DOSSIER_INTERNAT,
@@ -127,6 +139,7 @@ class Etudiant(models.Model):
                         date=nouv_prop.date_proposition,
                         message="L'étudiant a renoncé à l'internat").save()
 
+            # Enregistrement d'un changement de classe
             if old_prop.classe != nouv_prop.classe:
                 Action(proposition=nouv_prop,
                         categorie=Action.INSCRIPTION,
