@@ -96,7 +96,10 @@ class Etudiant(models.Model):
         self.proposition_actuelle = nouv_prop
         self.save()
 
-        if not old_prop:
+        # On envoie le dossier d'inscription s'il n'a pas encore été
+        # envoyé
+        if not (old_prop and Action.objects.filter(categorie=Action.ENVOI_DOSSIER,
+            statut__in=(Action.STATUT_TODO, Action.STATUT_FAIT))):
             Action(proposition=nouv_prop,
                     categorie=Action.ENVOI_DOSSIER,
                     date=nouv_prop.date_proposition).save()
