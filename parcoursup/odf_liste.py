@@ -48,7 +48,7 @@ def par_classe(classes, fileout):
             name='cell_entete', family='paragraph')
     TextProperties(parent=style_entete, fontweight='bold')
 
-    number_style_date_format = odf.number.NumberStyle(parent=ods.automaticstyles,
+    number_style_date_format = odf.number.DateStyle(parent=ods.automaticstyles,
             name='date_number')
     odf.number.DayOfWeek(parent=number_style_date_format)
     odf.number.Text(parent=number_style_date_format, text="/")
