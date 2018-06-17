@@ -21,6 +21,7 @@ from __future__ import unicode_literals
 from odf.opendocument import OpenDocumentSpreadsheet
 from odf.table import Table, TableColumn, TableRow, TableCell
 from odf.style import Style, TableColumnProperties, TextProperties
+import odf.number
 from odf.text import P
 
 def par_classe(classes, fileout):
@@ -46,6 +47,17 @@ def par_classe(classes, fileout):
     style_entete = Style(parent=ods.styles,
             name='cell_entete', family='paragraph')
     TextProperties(parent=style_entete, fontweight='bold')
+
+    number_style_date_format = odf.number.NumberStyle(parent=ods.automaticstyles,
+            name='date_number')
+    odf.number.DayOfWeek(parent=number_style_date_format)
+    odf.number.Text(parent=number_style_date_format, text="/")
+    odf.number.Month(parent=number_style_date_format)
+    odf.number.Text(parent=number_style_date_format, text="/")
+    odf.number.Year(parent=number_style_date_format)
+    style_date_format = Style(parent=ods.styles,
+            name='cell_date', family='table-cell',
+            datastylename=number_style_date_format)
 
     for classe in classes:
         table = Table(name=str(classe))
@@ -80,7 +92,8 @@ def par_classe(classes, fileout):
             TableCell(parent=tr).addElement(P(text=etudiant.prenom))
 
             cell = TableCell(valuetype='date',
-                    datevalue=str(etudiant.date_naissance))
+                    datevalue=str(etudiant.date_naissance),
+                    stylenale=style_date_format)
             cell.addElement(P(text=etudiant.date_naissance))
             tr.addElement(cell)
 
