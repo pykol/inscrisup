@@ -25,6 +25,7 @@ from . import views
 urlpatterns = [
     url(r'^$', views.index, name='index'),
     url(r'^classe/(?P<slug>[-\w]+)/$', views.ClasseDetailView.as_view(), name='classe.details'),
+    url(r'^classes/odf/$', views.export_odf_classes, name='classes.odf'),
     url(r'^internat/$', views.internat_detail, name='internat.details'),
     url(r'^etudiant/(?P<pk>[0-9]+)/$', views.EtudiantDetailView.as_view(), name='etudiant.details'),
     url(r'^etudiant/(?P<pk>[0-9]+)/pdf_adresse$', views.export_pdf_adresse_etudiant, name='etudiant.pdf_adresse'),

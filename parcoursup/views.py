@@ -32,6 +32,7 @@ from .models import Classe, Etudiant, Action, Proposition, \
         ParcoursupSynchro
 from .forms import PropositionForm, ParcoursupImportForm
 from .pdf_adresses import pdf_adresses
+from .odf_liste import par_classe as odf_par_classe
 
 @login_required
 def index(request):
@@ -227,3 +228,10 @@ def internat_detail(request):
                 'num_femmes': num_femmes,
                 'par_classe': par_classe,
                 })
+
+@login_required
+def export_odf_classes(request):
+    response = HttpResponse(content_type='application/vnd.oasis.opendocument.spreadsheet')
+    response['Content-Disposition'] = 'attachment; filename="liste_classes.ods"'
+    odf_par_classe(Classe.objects.all().order_by('nom'), response)
+    return response
