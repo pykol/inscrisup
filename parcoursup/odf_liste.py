@@ -42,7 +42,7 @@ def par_classe(classes, fileout):
         table = Table(name=str(classe))
         table.addElement(TableColumn(stylename=style_civilite)) # Sexe
         table.addElement(TableColumn(stylename=style_nom)) # Nom
-        table.addElement(TableColumn(stylename=style_prenom)) # Prénom
+        table.addElement(TableColumn(stylename=style_nom)) # Prénom
         table.addElement(TableColumn(stylename=style_date)) # Date de naissance
         table.addElement(TableColumn()) # Internat
         table.addElement(TableColumn()) # État vœu
