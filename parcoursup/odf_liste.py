@@ -20,7 +20,8 @@ from __future__ import unicode_literals
 
 from odf.opendocument import OpenDocumentSpreadsheet
 from odf.table import Table, TableColumn, TableRow, TableCell
-from odf.style import Style, TableColumnProperties, TextProperties
+from odf.style import Style, TableColumnProperties, TableRowProperties, \
+        TextProperties, ParagraphProperties
 import odf.number
 from odf.text import P
 
@@ -33,29 +34,38 @@ def par_classe(classes, fileout):
 
     style_nom = Style(parent=ods.automaticstyles,
             name='col_nom', family='table-column')
-    TableColumnProperties(parent=style_nom, columnwidth='4cm')
+    TableColumnProperties(parent=style_nom, columnwidth='4.5cm')
 
     style_date = Style(parent=ods.automaticstyles,
             name='col_date', family='table-column')
-    TableColumnProperties(parent=style_date, columnwidth='2.2cm')
+    TableColumnProperties(parent=style_date, columnwidth='3.2cm')
 
-    style_titre = Style(parent=ods.styles,
-            name='ligne_titre', family='paragraph')
+    style_etat_voeu = Style(parent=ods.automaticstyles,
+            name='col_etat_voeu', family='table-column')
+    TableColumnProperties(parent=style_etat_voeu, columnwidth='4cm')
+
+    style_titre = Style(parent=ods.automaticstyles,
+            name='cell_titre', family='table-cell')
     TextProperties(parent=style_titre, fontweight='bold',
             fontsize='14pt')
+    ParagraphProperties(parent=style_titre, textalign='center')
 
-    style_entete = Style(parent=ods.styles,
-            name='cell_entete', family='paragraph')
+    style_ligne_titre = Style(parent=ods.automaticstyles,
+            name='ligne_titre', family='table-row')
+    TableRowProperties(parent=style_ligne_titre, rowheight='8mm')
+
+    style_entete = Style(parent=ods.automaticstyles,
+            name='cell_entete', family='table-cell')
     TextProperties(parent=style_entete, fontweight='bold')
 
     number_style_date_format = odf.number.DateStyle(parent=ods.automaticstyles,
             name='date_number')
-    odf.number.DayOfWeek(parent=number_style_date_format)
+    odf.number.Day(parent=number_style_date_format, style='long')
     odf.number.Text(parent=number_style_date_format, text="/")
-    odf.number.Month(parent=number_style_date_format)
+    odf.number.Month(parent=number_style_date_format, style='long')
     odf.number.Text(parent=number_style_date_format, text="/")
-    odf.number.Year(parent=number_style_date_format)
-    style_date_format = Style(parent=ods.styles,
+    odf.number.Year(parent=number_style_date_format, style='long')
+    style_date_format = Style(parent=ods.automaticstyles,
             name='cell_date', family='table-cell',
             datastylename=number_style_date_format)
 
@@ -66,20 +76,21 @@ def par_classe(classes, fileout):
         table.addElement(TableColumn(stylename=style_nom)) # Prénom
         table.addElement(TableColumn(stylename=style_date)) # Date de naissance
         table.addElement(TableColumn()) # Internat
-        table.addElement(TableColumn()) # État vœu
+        table.addElement(TableColumn(stylename=style_etat_voeu)) # État vœu
 
         # En-tête de la feuille
-        tr = TableRow(parent=table)
-        cell = TableCell(parent=tr, numbercolumnsspanned=6)
-        cell.addElement(P(text=str(classe), stylename=style_titre))
+        tr = TableRow(parent=table, stylename=style_ligne_titre)
+        cell = TableCell(parent=tr, numbercolumnsspanned=6,
+                stylename=style_titre)
+        cell.addElement(P(text=str(classe)))
 
         tr = TableRow(parent=table)
         TableCell(parent=tr) # Sexe
-        P(parent=TableCell(parent=tr), text="Nom", stylename=style_entete)
-        P(parent=TableCell(parent=tr), text="Prénom", stylename=style_entete)
-        P(parent=TableCell(parent=tr), text="Date de naissance", stylename=style_entete)
-        P(parent=TableCell(parent=tr), text="Internat", stylename=style_entete)
-        P(parent=TableCell(parent=tr), text="État Parcoursup", stylename=style_entete)
+        P(parent=TableCell(parent=tr, stylename=style_entete), text="Nom")
+        P(parent=TableCell(parent=tr, stylename=style_entete), text="Prénom")
+        P(parent=TableCell(parent=tr, stylename=style_entete), text="Date de naissance")
+        P(parent=TableCell(parent=tr, stylename=style_entete), text="Internat")
+        P(parent=TableCell(parent=tr, stylename=style_entete), text="État Parcoursup")
 
         for etudiant in classe.admissions().order_by('nom'):
             tr = TableRow()
