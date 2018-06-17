@@ -36,7 +36,7 @@ def par_classe(classes, fileout):
 
     style_date = Style(parent=ods.automaticstyles,
             name='col_date', family='table-column')
-    TableColumnProperties(parent=style_nom, columnwidth='2.2cm')
+    TableColumnProperties(parent=style_date, columnwidth='2.2cm')
 
     for classe in classes:
         table = Table(name=str(classe))
