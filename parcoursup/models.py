@@ -111,7 +111,7 @@ class Etudiant(models.Model):
 
             # On rattache toutes les actions d'envoi pas encore traitées
             # à la proposition actuelle
-            Actions.objects.filter(statut=Action.STATUT_TODO,
+            Action.objects.filter(statut=Action.STATUT_TODO,
                     categorie__in=(Action.ENVOI_DOSSIER,
                         Action.ENVOI_DOSSIER_INTERNAT),
                     proposition__etudiant=self).update(proposition=nouv_prop)
