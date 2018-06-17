@@ -93,7 +93,7 @@ def par_classe(classes, fileout):
 
             cell = TableCell(valuetype='date',
                     datevalue=str(etudiant.date_naissance),
-                    stylenale=style_date_format)
+                    stylename=style_date_format)
             cell.addElement(P(text=etudiant.date_naissance))
             tr.addElement(cell)
 
