@@ -20,26 +20,63 @@ from __future__ import unicode_literals
 
 from odf.opendocument import OpenDocumentSpreadsheet
 from odf.table import Table, TableColumn, TableRow, TableCell
+from odf.style import Style, TableColumnProperties
 from odf.text import P
 
 def par_classe(classes, fileout):
     ods = OpenDocumentSpreadsheet()
+
+    style_civilite = Style(parent=ods.automaticstyles,
+            name='col_civilite', family='table-column')
+    TableColumnProperties(parent=style_civilite, columnwidth='1cm')
+
+    style_nom = Style(parent=ods.automaticstyles,
+            name='col_nom', family='table-column')
+    TableColumnProperties(parent=style_nom, columnwidth='4cm')
+
+    style_date = Style(parent=ods.automaticstyles,
+            name='col_date', family='table-column')
+    TableColumnProperties(parent=style_nom, columnwidth='2.2cm')
+
     for classe in classes:
         table = Table(name=str(classe))
-        table.addElement(TableColumn())
-        table.addElement(TableColumn())
-        table.addElement(TableColumn())
+        table.addElement(TableColumn(stylename=style_civilite)) # Sexe
+        table.addElement(TableColumn(stylename=style_nom)) # Nom
+        table.addElement(TableColumn(stylename=style_prenom)) # Prénom
+        table.addElement(TableColumn(stylename=style_date)) # Date de naissance
+        table.addElement(TableColumn()) # Internat
+        table.addElement(TableColumn()) # État vœu
+
+        # En-tête de la feuille
+        tr = TableRow()
+        cell = TableCell(numbercolumnsspanned=6)
+        cell.addElement(P(text=str(classe)))
+        table.addElement(tr)
 
         for etudiant in classe.admissions().order_by('nom'):
             tr = TableRow()
             table.addElement(tr)
 
             cell = TableCell()
-            cell.addElement(P(text=str(etudiant)))
+            cell.addElement(P(text=etudiant.get_sexe_display()))
             tr.addElement(cell)
 
             cell = TableCell()
+            cell.addElement(P(text=etudiant.nom))
+            tr.addElement(cell)
+
+            cell = TableCell()
+            cell.addElement(P(text=etudiant.prenom))
+            tr.addElement(cell)
+
+            cell = TableCell(valuetype='date',
+                    datevalue=str(etudiant.date_naissance))
             cell.addElement(P(text=etudiant.date_naissance))
+            tr.addElement(cell)
+
+            cell = TableCell()
+            if etudiant.proposition_actuelle.internat:
+                cell.addElement(P(text="Interne"))
             tr.addElement(cell)
 
             cell = TableCell()
