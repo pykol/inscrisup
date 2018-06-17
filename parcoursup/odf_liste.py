@@ -51,6 +51,7 @@ def par_classe(classes, fileout):
         tr = TableRow()
         cell = TableCell(numbercolumnsspanned=6)
         cell.addElement(P(text=str(classe)))
+        tr.addElement(cell)
         table.addElement(tr)
 
         for etudiant in classe.admissions().order_by('nom'):
