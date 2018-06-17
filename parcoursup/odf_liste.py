@@ -20,7 +20,7 @@ from __future__ import unicode_literals
 
 from odf.opendocument import OpenDocumentSpreadsheet
 from odf.table import Table, TableColumn, TableRow, TableCell
-from odf.style import Style, TableColumnProperties
+from odf.style import Style, TableColumnProperties, TextProperties
 from odf.text import P
 
 def par_classe(classes, fileout):
@@ -38,6 +38,15 @@ def par_classe(classes, fileout):
             name='col_date', family='table-column')
     TableColumnProperties(parent=style_date, columnwidth='2.2cm')
 
+    style_titre = Style(parent=ods.styles,
+            name='ligne_titre', family='paragraph')
+    TextProperties(parent=style_titre, fontweight='bold',
+            fontsize='14pt')
+
+    style_entete = Style(parent=ods.styles,
+            name='cell_entete', family='paragraph')
+    TextProperties(parent=style_entete, fontweight='bold')
+
     for classe in classes:
         table = Table(name=str(classe))
         table.addElement(TableColumn(stylename=style_civilite)) # Sexe
@@ -48,27 +57,27 @@ def par_classe(classes, fileout):
         table.addElement(TableColumn()) # État vœu
 
         # En-tête de la feuille
-        tr = TableRow()
-        cell = TableCell(numbercolumnsspanned=6)
-        cell.addElement(P(text=str(classe)))
-        tr.addElement(cell)
-        table.addElement(tr)
+        tr = TableRow(parent=table)
+        cell = TableCell(parent=tr, numbercolumnsspanned=6)
+        cell.addElement(P(text=str(classe), stylename=style_titre))
+
+        tr = TableRow(parent=table)
+        TableCell(parent=tr) # Sexe
+        P(parent=TableCell(parent=tr), text="Nom", stylename=style_entete)
+        P(parent=TableCell(parent=tr), text="Prénom", stylename=style_entete)
+        P(parent=TableCell(parent=tr), text="Date de naissance", stylename=style_entete)
+        P(parent=TableCell(parent=tr), text="Internat", stylename=style_entete)
+        P(parent=TableCell(parent=tr), text="État Parcoursup", stylename=style_entete)
 
         for etudiant in classe.admissions().order_by('nom'):
             tr = TableRow()
             table.addElement(tr)
 
-            cell = TableCell()
-            cell.addElement(P(text=etudiant.get_sexe_display()))
-            tr.addElement(cell)
+            TableCell(parent=tr).addElement(P(text=etudiant.get_sexe_display()))
 
-            cell = TableCell()
-            cell.addElement(P(text=etudiant.nom))
-            tr.addElement(cell)
+            TableCell(parent=tr).addElement(P(text=etudiant.nom))
 
-            cell = TableCell()
-            cell.addElement(P(text=etudiant.prenom))
-            tr.addElement(cell)
+            TableCell(parent=tr).addElement(P(text=etudiant.prenom))
 
             cell = TableCell(valuetype='date',
                     datevalue=str(etudiant.date_naissance))
@@ -80,9 +89,7 @@ def par_classe(classes, fileout):
                 cell.addElement(P(text="Interne"))
             tr.addElement(cell)
 
-            cell = TableCell()
-            cell.addElement(P(text=etudiant.proposition_actuelle.get_statut_display()))
-            tr.addElement(cell)
+            TableCell(parent=tr).addElement(P(text=etudiant.proposition_actuelle.get_statut_display()))
 
         ods.spreadsheet.addElement(table)
 
