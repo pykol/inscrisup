@@ -81,26 +81,26 @@ def par_classe(classes, fileout):
         # En-tête de la feuille
         tr = TableRow(parent=table, stylename=style_ligne_titre)
         cell = TableCell(parent=tr, numbercolumnsspanned=6,
-                stylename=style_titre)
+                valuetype='string', stylename=style_titre)
         cell.addElement(P(text=str(classe)))
 
         tr = TableRow(parent=table)
         TableCell(parent=tr) # Sexe
-        P(parent=TableCell(parent=tr, stylename=style_entete), text="Nom")
-        P(parent=TableCell(parent=tr, stylename=style_entete), text="Prénom")
-        P(parent=TableCell(parent=tr, stylename=style_entete), text="Date de naissance")
-        P(parent=TableCell(parent=tr, stylename=style_entete), text="Internat")
-        P(parent=TableCell(parent=tr, stylename=style_entete), text="État Parcoursup")
+        P(parent=TableCell(parent=tr, valuetype='string', stylename=style_entete), text="Nom")
+        P(parent=TableCell(parent=tr, valuetype='string', stylename=style_entete), text="Prénom")
+        P(parent=TableCell(parent=tr, valuetype='string', stylename=style_entete), text="Date de naissance")
+        P(parent=TableCell(parent=tr, valuetype='string', stylename=style_entete), text="Internat")
+        P(parent=TableCell(parent=tr, valuetype='string', stylename=style_entete), text="État Parcoursup")
 
         for etudiant in classe.admissions().order_by('nom'):
             tr = TableRow()
             table.addElement(tr)
 
-            TableCell(parent=tr).addElement(P(text=etudiant.get_sexe_display()))
+            TableCell(parent=tr, valuetype='string').addElement(P(text=etudiant.get_sexe_display()))
 
-            TableCell(parent=tr).addElement(P(text=etudiant.nom))
+            TableCell(parent=tr, valuetype='string').addElement(P(text=etudiant.nom))
 
-            TableCell(parent=tr).addElement(P(text=etudiant.prenom))
+            TableCell(parent=tr, valuetype='string').addElement(P(text=etudiant.prenom))
 
             cell = TableCell(valuetype='date',
                     datevalue=str(etudiant.date_naissance),
@@ -108,12 +108,12 @@ def par_classe(classes, fileout):
             cell.addElement(P(text=etudiant.date_naissance))
             tr.addElement(cell)
 
-            cell = TableCell()
+            cell = TableCell(valuetype='string')
             if etudiant.proposition_actuelle.internat:
                 cell.addElement(P(text="Interne"))
             tr.addElement(cell)
 
-            TableCell(parent=tr).addElement(P(text=etudiant.proposition_actuelle.get_statut_display()))
+            TableCell(parent=tr, valuetype='string').addElement(P(text=etudiant.proposition_actuelle.get_statut_display()))
 
         ods.spreadsheet.addElement(table)
 
