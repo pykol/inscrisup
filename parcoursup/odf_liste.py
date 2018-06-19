@@ -80,7 +80,8 @@ def par_classe(classes, fileout):
 
         # En-tête de la feuille
         tr = TableRow(parent=table, stylename=style_ligne_titre)
-        cell = TableCell(parent=tr, numbercolumnsspanned=6,
+        cell = TableCell(parent=tr,
+                numbercolumnsspanned=6, numberrowsspanned=1,
                 valuetype='string', stylename=style_titre)
         cell.addElement(P(text=str(classe)))
 
