@@ -250,7 +250,7 @@ class Parcoursup:
             Transformation du texte donnant la date de réponse en un
             objet datetime.datetime Python.
             """
-            # La fonction strptime() interprète le motif "%b" comme
+            # La fonction strptime() interprète le motif "%B" comme
             # étant le nom du mois en toutes lettres. Elle doit pour
             # cela savoir dans quelle langue on travaille. On force
             # temporairement le changement de locale pour travailler en
@@ -259,9 +259,14 @@ class Parcoursup:
             locale.setlocale(locale.LC_TIME, 'fr_FR.UTF-8')
             try:
                 date = datetime.datetime.strptime(parser_default(td),
-                        "%d %b %Y %H:%M").replace(tzinfo=paris_tz)
+                        "%d %B %Y %H:%M").replace(tzinfo=paris_tz)
             except ValueError:
-                date = None
+                # On tente aussi avec le mois abrégé, si jamais ça passe
+                try:
+                    date = datetime.datetime.strptime(parser_default(td),
+                            "%d %b %Y %H:%M").replace(tzinfo=paris_tz)
+                except ValueError:
+                    date = None
             # On remet la locale à son ancienne valeur pour ne pas
             # risquer de perturber le reste du monde.
             locale.setlocale(locale.LC_TIME, old_loc)
