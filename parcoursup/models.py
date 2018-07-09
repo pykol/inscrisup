@@ -36,6 +36,8 @@ class Etudiant(models.Model):
     email = models.EmailField(blank=True, null=False)
     telephone = models.CharField(verbose_name="téléphone",
             max_length=20, blank=True, null=False)
+    telephone_mobile = models.CharField(verbose_name="téléphone mobile",
+            max_length=20, blank=True, null=False)
     dossier_parcoursup = models.IntegerField("numéro de dossier",
             primary_key=True)
     adresse = models.TextField(blank=True, null=False)

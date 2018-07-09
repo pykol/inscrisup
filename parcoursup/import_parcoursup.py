@@ -416,6 +416,8 @@ class Parcoursup:
 
             telephone = ligne[11]
 
+            telephone_mobile = ligne[12]
+
             if ligne[2] == 'M.':
                 sexe = Etudiant.SEXE_HOMME
             else:
@@ -425,7 +427,8 @@ class Parcoursup:
 
             adresses[numero] = {'adresse': adresse, 'email': email,
                     'sexe': sexe, 'date_naissance': date_naissance,
-                    'telephone': telephone}
+                    'telephone': telephone,
+                    'telephone_mobile': telephone_mobile}
 
         return adresses
 

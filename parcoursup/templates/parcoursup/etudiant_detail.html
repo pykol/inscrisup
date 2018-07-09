@@ -25,9 +25,18 @@
     </td>
   </tr>
   <tr>
-    <td><i class="fas fa-at"></i>E-mail</td>
+    <td><i class="fas fa-phone"></i>Téléphone fixe</td>
     <td>{% if etudiant.telephone %}
       <a href="tel:{{ etudiant.telephone }}">{{ etudiant.telephone }}</a>
+      {% else %}
+      Le numéro de téléphone n'a pas pu être encore obtenu depuis Parcoursup.
+      {% endif %}
+    </td>
+  </tr>
+  <tr>
+    <td><i class="fas fa-mobile-alt"></i>Téléphone mobile</td>
+    <td>{% if etudiant.telephone_mobile %}
+      <a href="tel:{{ etudiant.telephone_mobile }}">{{ etudiant.telephone_mobile }}</a>
       {% else %}
       Le numéro de téléphone n'a pas pu être encore obtenu depuis Parcoursup.
       {% endif %}

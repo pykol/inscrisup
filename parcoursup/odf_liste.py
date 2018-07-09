@@ -79,11 +79,12 @@ def par_classe(classes, fileout):
         table.addElement(TableColumn(stylename=style_etat_voeu)) # État vœu
         table.addElement(TableColumn(stylename=style_nom)) # E-mail
         table.addElement(TableColumn(stylename=style_nom)) # Téléphone
+        table.addElement(TableColumn(stylename=style_nom)) # Mobile
 
         # En-tête de la feuille
         tr = TableRow(parent=table, stylename=style_ligne_titre)
         cell = TableCell(parent=tr,
-                numbercolumnsspanned=8, numberrowsspanned=1,
+                numbercolumnsspanned=9, numberrowsspanned=1,
                 valuetype='string', stylename=style_titre)
         cell.addElement(P(text=str(classe)))
 
@@ -96,6 +97,7 @@ def par_classe(classes, fileout):
         P(parent=TableCell(parent=tr, valuetype='string', stylename=style_entete), text="État Parcoursup")
         P(parent=TableCell(parent=tr, valuetype='string', stylename=style_entete), text="E-mail")
         P(parent=TableCell(parent=tr, valuetype='string', stylename=style_entete), text="Téléphone")
+        P(parent=TableCell(parent=tr, valuetype='string', stylename=style_entete), text="Mobile")
 
         for etudiant in classe.admissions().order_by('nom'):
             tr = TableRow()
@@ -122,6 +124,7 @@ def par_classe(classes, fileout):
 
             TableCell(parent=tr, valuetype='string').addElement(P(text=etudiant.email))
             TableCell(parent=tr, valuetype='string').addElement(P(text=etudiant.telephone))
+            TableCell(parent=tr, valuetype='string').addElement(P(text=etudiant.telephone_mobile))
 
         ods.spreadsheet.addElement(table)
 
