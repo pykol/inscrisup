@@ -406,24 +406,24 @@ class Parcoursup:
             numero = int(ligne[0])
 
             adresse = format_adresse_pays(
-                    adresse1 = ligne[6],
-                    adresse2 = ligne[7],
-                    code_postal = ligne[8],
-                    ville = ligne[9],
-                    pays = ligne[10])
+                    adresse1 = ligne[7],
+                    adresse2 = ligne[8],
+                    code_postal = ligne[9],
+                    ville = ligne[10],
+                    pays = ligne[11])
 
-            email = ligne[21]
+            email = ligne[22]
 
-            telephone = ligne[11]
+            telephone = ligne[12]
 
-            telephone_mobile = ligne[12]
+            telephone_mobile = ligne[13]
 
-            if ligne[2] == 'M.':
+            if ligne[3] == 'M.':
                 sexe = Etudiant.SEXE_HOMME
             else:
                 sexe = Etudiant.SEXE_FEMME
 
-            date_naissance = parse_date(ligne[5])
+            date_naissance = parse_date(ligne[6])
 
             adresses[numero] = {'adresse': adresse, 'email': email,
                     'sexe': sexe, 'date_naissance': date_naissance,
