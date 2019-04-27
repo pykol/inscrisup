@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # Inscrisup - Gestion des inscriptions administratives après Parcoursup
-# Copyright (c) 2018 Florian Hatat
+# Copyright (c) 2018-2019 Florian Hatat
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as published by
@@ -16,26 +16,26 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from __future__ import unicode_literals
-
-from django.conf.urls import url
+from django.urls import path, include
 
 from . import views
 
 urlpatterns = [
-    url(r'^$', views.index, name='index'),
-    url(r'^classe/(?P<slug>[-\w]+)/$', views.ClasseDetailView.as_view(), name='classe.details'),
-    url(r'^classes/odf/$', views.export_odf_classes, name='classes.odf'),
-    url(r'^internat/$', views.internat_detail, name='internat.details'),
-    url(r'^etudiant/(?P<pk>[0-9]+)/$', views.EtudiantDetailView.as_view(), name='etudiant.details'),
-    url(r'^etudiant/(?P<pk>[0-9]+)/pdf_adresse$', views.export_pdf_adresse_etudiant, name='etudiant.pdf_adresse'),
-    url(r'^etudiant/(?P<pk>[0-9]+)/demission$', views.etudiant_demission, name='etudiant.demission'),
-    url(r'^proposition/ajout/$', views.proposition_ajout, name='proposition.ajout'),
-    url(r'^proposition/import/$', views.parcoursup_import, name='proposition.parcoursup_import'),
-    url(r'^proposition/import/auto$', views.parcoursup_auto_import, name='proposition.parcoursup_auto_import'),
-    url(r'^action/$', views.ActionTodoListView.as_view(), name='action.liste'),
-    url(r'^action/(?P<pk>[0-9]+)/$', views.ActionDetailView.as_view(), name='action.details'),
-    url(r'^action/(?P<pk>[0-9]+)/traiter$', views.action_traiter, name='action.traiter'),
-    url(r'^action/pdf_adresses/$', views.export_pdf_adresses, name='action.export_pdf_adresses'),
-    url(r'^action/pdf_adresses/definitif$', views.export_pdf_adresses_definitif, name='action.export_pdf_adresses_definitif'),
+    path('', views.index, name='index'),
+    path('classe/<slug:slug>/', views.ClasseDetailView.as_view(), name='classe.details'),
+    path('classes/odf/', views.export_odf_classes, name='classes.odf'),
+    path('internat/', views.internat_detail, name='internat.details'),
+    path('etudiant/<int:pk>/', views.EtudiantDetailView.as_view(), name='etudiant.details'),
+    path('etudiant/<int:pk>/pdf_adresse', views.export_pdf_adresse_etudiant, name='etudiant.pdf_adresse'),
+    path('etudiant/<int:pk>/demission', views.etudiant_demission, name='etudiant.demission'),
+    path('proposition/ajout/', views.proposition_ajout, name='proposition.ajout'),
+    path('proposition/import/', views.parcoursup_import, name='proposition.parcoursup_import'),
+    path('proposition/import/auto', views.parcoursup_auto_import, name='proposition.parcoursup_auto_import'),
+    path('action/', views.ActionTodoListView.as_view(), name='action.liste'),
+    path('action/<int:pk>/', views.ActionDetailView.as_view(), name='action.details'),
+    path('action/<int:pk>/traiter', views.action_traiter, name='action.traiter'),
+    path('action/pdf_adresses/', views.export_pdf_adresses, name='action.export_pdf_adresses'),
+    path('action/pdf_adresses/definitif', views.export_pdf_adresses_definitif, name='action.export_pdf_adresses_definitif'),
+
+    path('parcoursup/admissions/', views.parcoursup.admissions, name='parcoursup_admissions'),
 ]
