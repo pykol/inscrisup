@@ -41,8 +41,7 @@ class ParcoursupRequest:
 
 		self.data = data
 		self.data.update({
-			# Oui, il y a une faute de frappe dans l'API Parcoursup
-			'indentifiant': {
+			'identifiant': {
 				'login': login,
 				'pwd': password,
 			}
@@ -68,13 +67,18 @@ class ParcoursupRequest:
 
 		self.request = requests.post(self.get_url(), json=self.data)
 
-class ParcoursupCandidat:
-	def __init__(self, code, nom, prenom, date_naissance, ine):
-		self.code = code
-		self.nom = nom
-		self.prenom = prenom
-		self.date_naissance = date_naissance
-		self.ine = ine
+class ParcoursupPersonne:
+	def __init__(self, **kwargs):
+		self.nom = kwargs.get('nom')
+		self.prenom = kwargs.get('prenom')
+		self.email = kwargs.get('email')
+
+class ParcoursupCandidat(ParcoursupPersonne):
+	def __init__(self, **kwargs)
+		super().__init__(**kwargs)
+		self.code = kwargs.get('code')
+		self.date_naissance = kwargs.get('date_naissance')
+		self.ine = kwargs.get('ine')
 
 	def to_json(self):
 		return {
@@ -84,6 +88,21 @@ class ParcoursupCandidat:
 			'prenom': str(self.prenom),
 			'dateNaissance': self.date_naissance.strftime('%d/%m/%Y')
 		}
+
+class ParcoursupResponsableLegal(ParcoursupPersonne):
+    def __init__(self, **kwargs):
+		super().__init__(**kwargs)
+		self.candidat = kwargs.get('candidat')
+
+class ParcoursupProposition:
+	def __init__(self, **kwargs):
+		self.session = kwargs.get('session')
+		self.code_formation = kwargs.get('code_formation')
+		self.code_etablissement = kwargs.get('code_etablissement')
+		self.cesure = kwargs.get('cesure')
+		self.internat = kwargs.get('internat')
+		self.statut = kwargs.get('statut')
+		self.date = kwargs.get('date')
 
 class ParcoursupRest:
 	def __init__(self, login, password, code_etablissement):
@@ -134,6 +153,49 @@ class ParcoursupRest:
 		numéro de dossier.
 		"""
 		return self.get_candidats_admis(self, code_candidat=code_candidat)
+
+	def parse_parcoursup_admission(self, psup_json):
+		"""
+		Prend en paramètre le JSON envoyé par l'interface synchrone de
+		Parcoursup et renvoie les informations structurées avec les
+		classes ParcoursupCandidat, ParcoursupResponsableLegal et
+		ParcoursupProposition.
+		"""
+		donnees = psup_json['donneesCandidat']
+		candidat = ParcoursupCandidat(
+			nom=donnees['nom'],
+			prenom=donnees['prenom'],
+			email=donnees['mail'],
+			date_naissance=donnees['dateNaissance'], #TODO parse
+			code=donnees['codeCandidat'],
+			ine=donnees['ine']
+		)
+
+		proposition = ParcoursupProposition(
+			session=donnees['session'],
+			code_formation=donnees['codeFormationPsup'],
+			code_etablissement=donnees['codeEtablissementAffectation'],
+			cesure=donnees['cesure'],
+			internat=donnees['internat'],
+			date=donnees['dateReponse'],
+		)
+
+		responsables = []
+		for i in (1, 2):
+			try:
+				responsables.append(ParcoursupResponsableLegal(
+					nom=donnes['nomRL{}'.format(i)],
+					prenom=donnes['prenomRL{}'.format(i)],
+					email=donnes['mailRL{}'.format(i)])
+					candidat=candidat)
+			except KeyError:
+				pass
+
+		return {
+			'candidat': candidat,
+			'proposition': proposition,
+			'responsables': responsables,
+		}
 
 
 	# Codes des statuts d'inscription de l'API Parcoursup
