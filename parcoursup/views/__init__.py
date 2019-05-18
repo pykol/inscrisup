@@ -34,6 +34,8 @@ from .forms import PropositionForm, ParcoursupImportForm
 from .pdf_adresses import pdf_adresses
 from .odf_liste import par_classe as odf_par_classe
 
+from . import parcoursup
+
 @login_required
 def index(request):
     classe_list = Classe.objects.all().annotate(

@@ -21,7 +21,7 @@ from django.urls import path, include
 from . import views
 
 rest_parcoursup_urlpatterns = [
-    path('admissionCandidat', views.parcoursup.admission, name='parcoursup_admission'),
+    path('admissionCandidat', views.parcoursup.AdmissionView.as_view(), name='parcoursup_admission'),
 ]
 
 urlpatterns = [
