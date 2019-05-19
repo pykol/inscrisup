@@ -68,7 +68,7 @@
     <td>{{ proposition.date_proposition }}</td>
     <td><a href="{{ proposition.classe.get_absolute_url }}">{{ proposition.classe }}</a></td>
     <td>{{ proposition.internat|yesno }}</td>
-    <td>{{ proposition.get_statut_display }}</td>
+    <td>{{ proposition.get_etat_display }}</td>
   </tr>
   {% endfor %}
 </table>
@@ -88,7 +88,7 @@
   {% for action in proposition.action_set.all %}
   <tr>
     <td>{{ action.date }}</td>
-    <td>{{ action.get_statut_display }}</td>
+    <td>{{ action.get_etat_display }}</td>
     <td>{{ action.get_categorie_display }}{% if action.message %}<br>{{ action.message }}{% endif %}</td>
     <td>{% if action.date_fait %}{{ action.date_fait }}{% else %}-{% endif %}</td>
   </tr>

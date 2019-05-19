@@ -22,8 +22,10 @@ from django.http import JsonResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import View
+from django.utils import timezone
 
-from parcoursup.models import ParcoursupUser, ParcoursupMessageRecuLog
+from parcoursup.models import ParcoursupUser, ParcoursupMessageRecuLog, \
+		Etudiant, Classe, Proposition
 import parcoursup.utils as utils
 
 class ParcoursupClientView(View):
@@ -44,7 +46,6 @@ class ParcoursupClientView(View):
 
 	def __init__(self, *args, **kwargs):
 		super().__init__(*args, **kwargs)
-		self.identification = None
 		self.json = None
 		self.user = None
 
@@ -65,15 +66,16 @@ class ParcoursupClientView(View):
 		"""
 		Vérifie que la requête contient bien des données en JSON.
 		"""
-		if 'application.json' != self.request.content_type:
+		if 'application/json' != self.request.content_type:
 			return False
 
 		try:
 			self.json = json.loads(self.request.body.decode('utf-8'))
+			return True
 		except (json.JSONDecodeError, UnicodeDecodeError):
 			return False
 
-	def json_reponse(self, ok, message=None, status_code=None):
+	def json_response(self, ok, message=None, status_code=None):
 		"""
 		Construction d'une réponse pour Parcoursup
 		"""
@@ -96,7 +98,9 @@ class ParcoursupClientView(View):
 
 			status_code = status_code if status_code is not None else 500
 
-		return JsonResponse(data, status_code=status_code)
+		response = JsonResponse(data)
+		response.status_code = status_code
+		return response
 
 	# On redéfinit cette méthode uniquement afin de la décorer, car les
 	# appels de l'API REST ne doivent pas être protégés par le jeton
@@ -114,7 +118,7 @@ class ParcoursupClientView(View):
 		except:
 			return self.request.META['REMOTE_ADDR']
 
-	def post(self):
+	def post(self, request):
 		"""
 		Traitement des données issues d'une requête POST provenant de
 		Parcoursup.
@@ -175,7 +179,7 @@ class AdmissionView(ParcoursupClientView):
 				'adresse': utils.format_adresse_pays(
 						adresse1=donnees['adresse1'],
 						adresse2=donnees['adresse2'],
-						code_postal=donnees['code_postal'],
+						code_postal=donnees['codePostal'],
 						ville=donnees['libelleCommune'],
 						pays=donnees['codePaysadresse'],
 					),
@@ -185,12 +189,15 @@ class AdmissionView(ParcoursupClientView):
 
 		# On détermine la proposition à laquelle fait référence le
 		# message actuel.
-		classe = Classe.objects.get(code_parcoursup=donnees['codeFormationpsup'])
+		classe = Classe.objects.get(code_parcoursup=donnees['codeFormationPsup'])
 		date_reponse = utils.parse_datetime(donnees['dateReponse'])
 		proposition = Proposition(
 			etudiant=etudiant,
 			classe=classe,
 			date_proposition=date_reponse,
+			cesure=donnees.get('cesure', 0) == 1,
+			internat=donnees.get('internat', 0) == 1,
+			inscription=donnees.get('etatInscription', 0) == 1,
 		)
 
 		# Le candidat n'a pas encore répondu
@@ -214,6 +221,10 @@ class AdmissionView(ParcoursupClientView):
 
 		# Proposition refusée
 		if donnees['codeSituation'] == 3:
+			proposition = Proposition.objects.get(
+				etudiant=etudiant, classe=classe,
+				cesure=proposition.cesure,
+				internat=proposition.internat)
 			proposition.demission(date_reponse)
 
-		return self.json_reponse(True)
+		return self.json_response(True)

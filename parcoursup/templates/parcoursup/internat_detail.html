@@ -40,7 +40,7 @@
     <td>{{ etudiant.dossier_parcoursup }}</td>
     <td><a href="{{ etudiant.get_absolute_url }}">{{ etudiant }}</a></td>
     <td>{{ etudiant.proposition_actuelle.classe }}</td>
-    <td>{{ etudiant.proposition_actuelle.get_statut_display }}</td>
+    <td>{{ etudiant.proposition_actuelle.get_etat_display }}</td>
   </tr>
   {% endfor %}
 </table>

@@ -18,6 +18,7 @@
 
 import datetime
 import re
+from dateutil.tz import gettz
 
 date_re = re.compile(r'(?P<day>\d{1,2})/(?P<month>\d{1,2})/(?P<year>\d{4})$')
 def parse_date(date):
@@ -50,4 +51,5 @@ def parse_datetime(date):
 	ISO pour les dates et heures, cela nous éviterait toutes ces
 	bizarreries.
 	"""
-	pass
+	paris_tz = gettz('Europe/Paris')
+	return datetime.datetime.strptime(date, "%d/%m/%Y %H:%M").replace(tzinfo=paris_tz)

@@ -42,7 +42,7 @@ l'enveloppe.
     <td><a href="{{ action.proposition.classe.get_absolute_url }}">{{ action.proposition.classe }}</a></td>
     <td>{{ action.proposition.etudiant.dossier_parcoursup }}</td>
     <td><a href="{{ action.proposition.etudiant.get_absolute_url }}">{{ action.proposition.etudiant }}</a></td>
-    <td>{{ action.proposition.get_statut_display }}</td>
+    <td>{{ action.proposition.get_etat_display }}</td>
     <td>{{ action.proposition.internat|yesno }}</td>
     <td>
       {% if action.est_envoi %}<i class="fas fa-envelope"></i>{% endif %}

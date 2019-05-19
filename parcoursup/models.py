@@ -240,7 +240,7 @@ class Proposition(models.Model):
 			action.annuler(date)
 
 		if not deja_demission:
-			Action(proposition=proposition,
+			Action(proposition=self,
 					categorie=Action.DEMISSION,
 					date=date).save()
 
@@ -350,7 +350,7 @@ class ParcoursupUserManager(models.Manager):
 
 class ParcoursupUser(models.Model):
 	username = models.CharField(max_length=50)
-	password = models.CharField(max_length=42)
+	password = models.CharField(max_length=128)
 
 	objects = ParcoursupUserManager()
 
