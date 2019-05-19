@@ -28,11 +28,11 @@ from django.db.models import Count, Q, F
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 
-from .models import Classe, Etudiant, Action, Proposition, \
+from parcoursup.models import Classe, Etudiant, Action, Proposition, \
         ParcoursupSynchro
-from .forms import PropositionForm, ParcoursupImportForm
-from .pdf_adresses import pdf_adresses
-from .odf_liste import par_classe as odf_par_classe
+from parcoursup.forms import PropositionForm, ParcoursupImportForm
+from parcoursup.pdf_adresses import pdf_adresses
+from parcoursup.odf_liste import par_classe as odf_par_classe
 
 from . import parcoursup
 
