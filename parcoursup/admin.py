@@ -20,7 +20,9 @@ from __future__ import unicode_literals
 
 from django.contrib import admin
 
-from .models import Etudiant, Classe, Proposition, Action
+from parcoursup.models import Etudiant, Classe, Proposition, Action, \
+		ParcoursupUser, ParcoursupMessageRecuLog, \
+		ParcoursupMessageEnvoyeLog
 
 admin.site.register(Classe)
 
@@ -45,3 +47,7 @@ class ActionAdmin(admin.ModelAdmin):
             'message',)
 
 admin.site.register(Action, ActionAdmin)
+
+admin.site.register(ParcoursupUser)
+admin.site.register(ParcoursupMessageRecuLog)
+admin.site.register(ParcoursupMessageEnvoyeLog)
