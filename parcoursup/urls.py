@@ -41,5 +41,5 @@ urlpatterns = [
     path('action/pdf_adresses/', views.export_pdf_adresses, name='action.export_pdf_adresses'),
     path('action/pdf_adresses/definitif', views.export_pdf_adresses_definitif, name='action.export_pdf_adresses_definitif'),
 
-    path('parcoursup/', include(rest_parcoursup_urlpattterns),
+    path('parcoursup/', include(rest_parcoursup_urlpatterns)),
 ]

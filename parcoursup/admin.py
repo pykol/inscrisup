@@ -41,7 +41,7 @@ class EtudiantAdmin(admin.ModelAdmin):
 admin.site.register(Etudiant, EtudiantAdmin)
 
 class ActionAdmin(admin.ModelAdmin):
-    list_display = ('proposition', 'date', 'categorie', 'statut',
+    list_display = ('proposition', 'date', 'categorie', 'etat',
             'message',)
 
 admin.site.register(Action, ActionAdmin)

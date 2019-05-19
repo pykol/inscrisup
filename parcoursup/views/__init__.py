@@ -50,9 +50,9 @@ def index(request):
 
     num_internat = props_internat.count()
     num_internat_oui = \
-            props_internat.filter(statut=Proposition.STATUT_OUI).count()
+            props_internat.filter(etat=Proposition.ETAT_OUI).count()
     num_internat_ouimais = \
-            props_internat.filter(statut=Proposition.STATUT_OUIMAIS).count()
+            props_internat.filter(etat=Proposition.ETAT_OUIMAIS).count()
 
     synchro_list = ParcoursupSynchro.objects.all().order_by('-date_debut')[:5].annotate(duree=F('date_fin')
             - F('date_debut'))
@@ -107,7 +107,7 @@ def etudiant_demission(request, pk):
 
 class ActionTodoListView(LoginRequiredMixin, generic.ListView):
     queryset = Action.objects.filter(
-            statut = Action.STATUT_TODO).order_by('proposition__statut',
+            etat = Action.ETAT_TODO).order_by('proposition__etat',
                     'proposition__etudiant__nom')
 
 class ActionDetailView(LoginRequiredMixin, generic.DetailView):
@@ -147,7 +147,7 @@ def parcoursup_import(request):
                         etudiant=etudiant,
                         date_proposition=datetime.datetime.now(),#XXX fichier ?
                         internat=internat,
-                        statut=ligne[7])
+                        etat=ligne[7])
 
                 etudiant.nouvelle_proposition(proposition)
 
@@ -173,7 +173,7 @@ def parcoursup_auto_import(request):
 @login_required
 def export_pdf_adresses(request):
     etudiants = Etudiant.objects.filter(
-            proposition__action__statut=Action.STATUT_TODO,
+            proposition__action__etat=Action.ETAT_TODO,
             proposition__action__categorie__in=(Action.ENVOI_DOSSIER,
                 Action.ENVOI_DOSSIER_INTERNAT)).order_by('nom')
     response = HttpResponse(content_type='application/pdf')
@@ -185,8 +185,8 @@ def export_pdf_adresses(request):
 @login_required
 def export_pdf_adresses_definitif(request):
     etudiants = Etudiant.objects.filter(
-            proposition__statut=Proposition.STATUT_OUI,
-            proposition__action__statut=Action.STATUT_TODO,
+            proposition__etat=Proposition.ETAT_OUI,
+            proposition__action__etat=Action.ETAT_TODO,
             proposition__action__categorie__in=(Action.ENVOI_DOSSIER,
                 Action.ENVOI_DOSSIER_INTERNAT))
     response = HttpResponse(content_type='application/pdf')

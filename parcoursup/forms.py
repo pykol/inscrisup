@@ -26,7 +26,7 @@ class PropositionForm(forms.ModelForm):
     class Meta:
         model = Proposition
         fields = ['classe', 'etudiant', 'date_proposition', 'internat',
-                'statut']
+                'etat']
 
     def save(self, commit=False):
         nouv_prop = super(PropositionForm, self).save(commit=commit)
