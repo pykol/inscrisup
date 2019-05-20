@@ -132,15 +132,17 @@ class ParcoursupClientView(View):
 		d'erreur générique est renvoyée à Parcoursup.
 		"""
 		msg_log = ParcoursupMessageRecuLog(date=timezone.now(),
-				ip_source=selF.get_ip_source(),
+				ip_source=self.get_ip_source(),
 				endpoint=self.endpoint)
 
 		if not self.entree_json():
+			msg_log.succes = False
 			msg_log.message = "Les données soumises ne sont pas au format JSON valide"
 			msg_log.save()
 			return self.json_response(False, msg_log.message)
 
 		if not self.identification():
+			msg_log.succes = False
 			msg_log.message = "Données d'identification incorrectes"
 			msg_log.save()
 			return self.json_response(False, msg_log.message)
