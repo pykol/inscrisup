@@ -89,6 +89,15 @@ class Etudiant(models.Model):
 		"""
 		old_prop = self.proposition_actuelle
 
+		actions_demission = Action.objects.filter(
+			etudiant=self,
+			categorie=Action.DEMISSION,
+			etat=Action.ETAT_TODO)
+
+		# On annule les démissions précédentes.
+		for action in actions_demission:
+			action.annuler(nouv_prop.date_proposition)
+
 		# Dans le cas où la nouvelle proposition correspond en fait à
 		# l'ancienne, mais seul l'état a changé (passant de oui mais à
 		# oui définitif), on enregistre seulement le changement d'état.
@@ -125,7 +134,7 @@ class Etudiant(models.Model):
 			old_prop.save()
 
 			# On rattache toutes les actions d'envoi pas encore traitées
-			# à la proposition actuelle
+			# à la proposition actuelle.
 			self.action_set.filter(etat=Action.ETAT_TODO,
 					categorie__in=(Action.ENVOI_DOSSIER,
 						Action.ENVOI_DOSSIER_INTERNAT)
@@ -139,11 +148,12 @@ class Etudiant(models.Model):
 							categorie=Action.ENVOI_DOSSIER,
 							proposition__etudiant=self).exists():
 				Action(proposition=nouv_prop,
+						etudiant=self,
 						categorie=Action.ENVOI_DOSSIER_INTERNAT,
 						date=nouv_prop.date_proposition).save()
 
 			# Si l'étudiant a renoncé à l'internat, on retire les envois
-			# de dossier d'internat
+			# de dossier d'internat.
 			if old_prop.internat and not nouv_prop.internat:
 				for action_envoi in Action.objects.filter(etat=Action.ETAT_TODO,
 						categorie=Action.ENVOI_DOSSIER_INTERNAT,
@@ -151,13 +161,21 @@ class Etudiant(models.Model):
 					action_envoi.annuler(nouv_prop_date.date_proposition)
 
 				Action(proposition=nouv_prop,
+						etudiant=self,
 						categorie=Action.INSCRIPTION,
 						date=nouv_prop.date_proposition,
 						message="L'étudiant a renoncé à l'internat").save()
 
-			# Enregistrement d'un changement de classe
-			if old_prop.classe != nouv_prop.classe:
+			# Enregistrement d'un changement de classe.
+			# Le cas du changement de classe peut aussi se produire si
+			# l'étudiant a démissionné par le passé et a dit oui à une
+			# nouvelle proposition. Dans ce cas, on annule l'action
+			# pour prendre en compte la démission, si elle n'a pas déjà
+			# été traitée.
+			if old_prop.classe != nouv_prop.classe or \
+					actions_demission.exclude(proposition__classe=nouv_prop.classe):
 				Action(proposition=nouv_prop,
+						etudiant=self,
 						categorie=Action.INSCRIPTION,
 						date=nouv_prop.date_proposition,
 						message="L'étudiant a changé de classe").save()
@@ -242,7 +260,12 @@ class Proposition(models.Model):
 		if not deja_demission:
 			Action(proposition=self,
 					categorie=Action.DEMISSION,
+					etudiant=self.etudiant,
 					date=date).save()
+
+		if self == self.etudiant.proposition_actuelle:
+			self.etudiant.proposition_actuelle = None
+			self.etudiant.save()
 
 	class Meta:
 		get_latest_by = 'date_proposition'
@@ -266,12 +289,14 @@ class Action(models.Model):
 	INSCRIPTION = 2
 	DEMANDE_PIECES = 3
 	DEMISSION = 4
+	CESURE = 5
 	CATEGORIE_CHOICES = (
 			(ENVOI_DOSSIER, "Envoi du dossier d'inscription"),
 			(ENVOI_DOSSIER_INTERNAT, "Envoi du dossier pour l'internat"),
 			(INSCRIPTION, "Inscription administrative"),
 			(DEMANDE_PIECES, "Demande de pièces complémentaires"),
 			(DEMISSION, "Enregistrement d'une démission"),
+			(CESURE, "Traiter la demande de césure"),
 		)
 	categorie = models.SmallIntegerField("catégorie",
 			choices=CATEGORIE_CHOICES)

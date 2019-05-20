@@ -221,10 +221,14 @@ class AdmissionView(ParcoursupClientView):
 
 		# Proposition refusée
 		if donnees['codeSituation'] == 3:
-			proposition = Proposition.objects.get(
-				etudiant=etudiant, classe=classe,
-				cesure=proposition.cesure,
-				internat=proposition.internat)
-			proposition.demission(date_reponse)
+			try:
+				proposition = Proposition.objects.get(
+					etudiant=etudiant, classe=classe,
+					cesure=proposition.cesure,
+					internat=proposition.internat,
+					date_demission__isnull=True)
+				proposition.demission(date_reponse)
+			except Proposition.DoesNotExist:
+				pass
 
 		return self.json_response(True)
