@@ -133,7 +133,8 @@ class ParcoursupClientView(View):
 		"""
 		msg_log = ParcoursupMessageRecuLog(date=timezone.now(),
 				ip_source=self.get_ip_source(),
-				endpoint=self.endpoint)
+				endpoint=self.endpoint,
+				payload=self.request.body)
 
 		if not self.entree_json():
 			msg_log.succes = False

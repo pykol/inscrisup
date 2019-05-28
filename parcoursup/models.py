@@ -407,6 +407,8 @@ class ParcoursupMessageRecuLog(models.Model):
 	endpoint = models.CharField(max_length=100)
 	message = models.CharField(max_length=200)
 	succes = models.BooleanField()
+	payload = models.BinaryField(verbose_name="données reçues",
+			blank=True)
 
 class ParcoursupMessageEnvoyeLog(models.Model):
 	"""
