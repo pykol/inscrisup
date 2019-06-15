@@ -415,3 +415,10 @@ class ParcoursupMessageEnvoyeLog(models.Model):
 	Journal des messages envoyés à Parcoursup
 	"""
 	date = models.DateTimeField()
+
+class Commune(models.Model):
+	"""
+	Commune française, identifiée par son code INSEE.
+	"""
+	insee = models.CharField(max_length=5, primary_key=True)
+	libelle = models.CharField(max_length=200)
