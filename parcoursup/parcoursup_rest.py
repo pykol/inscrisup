@@ -202,7 +202,10 @@ class ParcoursupRest:
 			adresse1=donnees.get('adresse1') or '',
 			adresse2=donnees.get('adresse2') or '',
 			adresse3=donnees.get('adresse3') or '',
-			code_postal=donnees.get('codepostal') or '',
+			# Orthographie affligeante. On teste les deux, pour être
+			# robuste à une future correction qui casse la
+			# compatibilité.
+			code_postal=donnees.get('codepostal', donnees.get('codepostale')) or '',
 			ville=libelle_ville,
 			pays=libelle_pays)
 		return re.sub(r'\n+', '\n', raw_adresse).strip()
