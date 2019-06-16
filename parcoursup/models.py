@@ -240,7 +240,8 @@ class Proposition(models.Model):
 	etat = models.SmallIntegerField(choices=ETAT_CHOICES)
 
 	# État de l'inscription administrative au lycée
-	inscription = models.BooleanField(verbose_name="inscription réalisée")
+	inscription = models.BooleanField(verbose_name="inscription réalisée",
+		default=False)
 
 	def __str__(self):
 		return str(self.date_proposition)
