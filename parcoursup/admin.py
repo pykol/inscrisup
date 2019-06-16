@@ -22,9 +22,13 @@ from django.contrib import admin
 
 from parcoursup.models import Etudiant, Classe, Proposition, Action, \
 		ParcoursupUser, ParcoursupMessageRecuLog, \
-		ParcoursupMessageEnvoyeLog
+		ParcoursupMessageEnvoyeLog, Commune
 
 admin.site.register(Classe)
+
+class CommuneAdmin(admin.ModelAdmin):
+	list_display = ('insee', 'libelle')
+admin.site.register(Commune, CommuneAdmin)
 
 class PropositionAdmin(admin.ModelAdmin):
     list_display = ('date_proposition', 'classe', 'etudiant',
