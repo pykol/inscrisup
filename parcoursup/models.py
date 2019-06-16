@@ -195,7 +195,7 @@ class Etudiant(models.Model):
 class Classe(models.Model):
 	nom = models.CharField(max_length=20)
 	slug = models.SlugField(unique=True)
-	code_parcoursup = models.SmallIntegerField()
+	code_parcoursup = models.SmallIntegerField(unique=True)
 	groupe_parcoursup = models.SmallIntegerField()
 	capacite = models.SmallIntegerField(verbose_name="capacité")
 	surbooking = models.SmallIntegerField(default=0)
