@@ -358,6 +358,15 @@ class ParcoursupSynchro(models.Model):
 	resultat = models.SmallIntegerField(verbose_name="résultat",
 			choices=RESULTAT_CHOICES, blank=True, null=True)
 
+	SOURCE_WEBSCRAP = 1
+	SOURCE_REST = 2
+	SOURCE_CHOICES = (
+		(SOURCE_WEBSCRAP, "extraction web"),
+		(SOURCE_REST, "interface synchrone"),
+	)
+	source = models.SmallIntegerField(verbose_name="source des données",
+			choices=SOURCE_CHOICES)
+
 class ParcoursupUserManager(models.Manager):
 	def authenticate(self, username, password):
 		"""

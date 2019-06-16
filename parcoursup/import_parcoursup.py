@@ -500,4 +500,5 @@ def auto_import(mode=ParcoursupSynchro.MODE_MANUEL):
     date_fin = timezone.now()
 
     ParcoursupSynchro(date_debut=date_debut, date_fin=date_fin,
-            mode=mode, resultat=resultat).save()
+            mode=mode, resultat=resultat,
+			source=ParcoursupSynchro.SOURCE_WEBSCRAP).save()
