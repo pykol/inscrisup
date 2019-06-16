@@ -328,18 +328,20 @@ def unsafe_auto_import_rest():
 				continue
 
 			# On importe l'étudiant qui n'existait pas encore
-			etudiant = Etudiant(
-					dossier_parcoursup=psup_etudiant.code,
-					nom=psup_etudiant.nom,
-					prenom=psup_etudiant.prenom,
-					email=psup_etudiant.email,
-					adresse=psup_etudiant.adresse,
-					telephone=psup_etudiant.telephone_fixe or '',
-					telephone_mobile=psup_etudiant.telephone_mobile or '',
-					sexe=psup_etudiant.sexe,
-					date_naissance=psup_etudiant.date_naissance
-					)
-			etudiant.save()
+			etudiant = Etudiant(dossier_parcoursup=psup_etudiant.code)
+
+		# On enregistre les coordonnées de l'étudiant, elles peuvent
+		# avoir été mises à jour par rapport à ce qui était dans la base
+		# de données.
+		etudiant.nom = psup_etudiant.nom,
+		etudiant.prenom = psup_etudiant.prenom,
+		etudiant.email = psup_etudiant.email,
+		etudiant.adresse = psup_etudiant.adresse,
+		etudiant.telephone = psup_etudiant.telephone_fixe or '',
+		etudiant.telephone_mobile = psup_etudiant.telephone_mobile or '',
+		etudiant.sexe = psup_etudiant.sexe,
+		etudiant.date_naissance = psup_etudiant.date_naissance
+		etudiant.save()
 
 		# On enregistre la proposition faite à cet étudiant
 		if psup_prop.etat != ParcoursupProposition.ETAT_REFUSEE:
