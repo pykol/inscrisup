@@ -33,6 +33,7 @@ from parcoursup.models import Classe, Etudiant, Action, Proposition, \
 from parcoursup.forms import PropositionForm, ParcoursupImportForm
 from parcoursup.pdf_adresses import pdf_adresses
 from parcoursup.odf_liste import par_classe as odf_par_classe
+from parcoursup.parcoursup_rest import auto_import_rest
 
 from . import parcoursup
 
