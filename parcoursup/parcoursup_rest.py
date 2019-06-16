@@ -186,7 +186,7 @@ class ParcoursupRest:
 	@staticmethod
 	def formate_adresse(donnees):
 		CODE_PAYS_FRANCE = '99100'
-		code_pays = donnees.get('codepays', CODE_PAYS_FRANCE)
+		code_pays = donnees.get('codepaysadresse', CODE_PAYS_FRANCE)
 		if code_pays == CODE_PAYS_FRANCE:
 			try:
 				libelle_ville = Commune.objects.get(pk=donnees.get('codecommune')).libelle
