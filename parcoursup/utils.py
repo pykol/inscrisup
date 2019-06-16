@@ -21,7 +21,7 @@ import re
 from dateutil.tz import gettz
 
 date_re = re.compile(r'(?P<day>\d{1,2})/(?P<month>\d{1,2})/(?P<year>\d{4})$')
-def parse_date(date):
+def parse_french_date(date):
 	"""
 	Renvoie un objet datetime.date à partir d'une chaine au format
 	JJ/MM/AAAA.

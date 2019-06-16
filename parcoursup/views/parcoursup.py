@@ -175,7 +175,7 @@ class AdmissionView(ParcoursupClientView):
 			defaults={
 				'nom': donnees['nom'],
 				'prenom': donnees['prenom'],
-				'date_naissance': utils.parse_date(donnees['dateNaissance']),
+				'date_naissance': utils.parse_french_date(donnees['dateNaissance']),
 				'email': donnees['mail'],
 				'telephone': donnees.get('telfixe'),
 				'telephone_mobile': donnees.get('telmobile'),
