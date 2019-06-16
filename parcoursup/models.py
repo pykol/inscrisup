@@ -190,7 +190,8 @@ class Etudiant(models.Model):
 		candidat.
 		"""
 		proposition = self.proposition_actuelle
-		proposition.demission(date)
+		if self.proposition_actuelle is not None:
+			proposition.demission(date)
 
 class Classe(models.Model):
 	nom = models.CharField(max_length=20)
