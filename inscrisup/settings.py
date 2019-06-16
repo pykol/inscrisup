@@ -127,3 +127,7 @@ LOGIN_REDIRECT_URL = 'index'
 # Connexion à Parcoursup
 PARCOURSUP_USER = 'utilisateur_parcoursup'
 PARCOURSUP_PASS = 'mot_de_passe_parcoursup'
+
+PARCOURSUP_REST_LOGIN = 'identifiant_rest'
+PARCOURSUP_REST_PASSWORD = 'mot_de_passe_rest'
+PARCOURSUP_UAI_ETABLISSEMENT = 'UAI établissement gestionnaire'
