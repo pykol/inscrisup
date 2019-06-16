@@ -166,8 +166,7 @@ def parcoursup_import(request):
 
 @login_required
 def parcoursup_auto_import(request):
-    from .import_parcoursup import auto_import
-    auto_import()
+    auto_import_rest()
     return redirect('index')
 
 @login_required

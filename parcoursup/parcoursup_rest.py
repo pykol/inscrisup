@@ -25,20 +25,21 @@ import re
 import requests
 from dateutil.tz import gettz
 
-from django import timezone
+from django.utils import timezone
 from django.conf import settings
 
-from parcoursup.models import Commune, Classe, Etudiant, Proposition
+from parcoursup.models import Commune, Classe, Etudiant, \
+		Proposition, ParcoursupSynchro
 from parcoursup.utils import parse_french_date
 
 PARCOURSUP_ENDPOINT = "https://ws.parcoursup.fr/ApiRest/"
 
 def parse_date_reponse(date_str):
 	paris_tz = gettz('Europe/Paris')
-	date_match = re.match('^(?P<jour>\d{1,2})/(?P<mois>\d{1,2})/(?P<annee>\d{3}) (?P<heure>\d{1,2}):(?P<minute>\d{1,2})$')
+	date_match = re.match('^(?P<jour>\d{1,2})/(?P<mois>\d{1,2})/(?P<annee>\d{3}) (?P<heure>\d{1,2}):(?P<minute>\d{1,2})$', date_str)
 	return datetime(
 		# Eh oui, Parcoursup renvoie l'année sur 3 chiffres...
-		year=int(date_match.group('annee') + 2000),
+		year=int(date_match.group('annee')) + 2000,
 		month=int(date_match.group('mois')),
 		day=int(date_match.group('jour')),
 		hour=int(date_match.group('heure')),
@@ -102,7 +103,7 @@ class ParcoursupPersonne:
 		self.sexe = kwargs.get('sexe')
 
 class ParcoursupCandidat(ParcoursupPersonne):
-	def __init__(self, **kwargs)
+	def __init__(self, **kwargs):
 		super().__init__(**kwargs)
 		self.code = kwargs.get('code')
 		self.date_naissance = kwargs.get('date_naissance')
@@ -118,7 +119,7 @@ class ParcoursupCandidat(ParcoursupPersonne):
 		}
 
 class ParcoursupResponsableLegal(ParcoursupPersonne):
-    def __init__(self, **kwargs):
+	def __init__(self, **kwargs):
 		super().__init__(**kwargs)
 		self.candidat = kwargs.get('candidat')
 
@@ -183,21 +184,25 @@ class ParcoursupRest:
 		return self.get_candidats_admis(self, code_candidat=code_candidat)
 
 	@staticmethod
-	def formate_adresse(**kwargs):
+	def formate_adresse(donnees):
 		CODE_PAYS_FRANCE = '99100'
-		code_pays = kwargs.get('codepays', CODE_PAYS_FRANCE)
+		code_pays = donnees.get('codepays', CODE_PAYS_FRANCE)
 		if code_pays == CODE_PAYS_FRANCE:
-			libelle_ville = Commune.objects.get(pk=kwargs.get('codecommune')).libelle
+			try:
+				libelle_ville = Commune.objects.get(pk=donnees.get('codecommune')).libelle
+			except Commune.DoesNotExist:
+				libelle_ville = '**** COMMUNE INCONNUE ****'
+				print("Commune {} inconnue".format(donnees.get('codecommune')))
 			libelle_pays = ''
 		else:
-			libelle_ville = kwargs.get('commune') or ''
-			libelle_pays = kwargs.get('libellepays') or ''
+			libelle_ville = donnees.get('commune') or ''
+			libelle_pays = donnees.get('libellepays') or ''
 
 		raw_adresse = '{adresse1}\n{adresse2}\n{adresse3}\n{code_postal} {ville}\n{pays}'.format(
-			adresse1=kwargs.get('adresse1') or '',
-			adresse2=kwargs.get('adresse2') or '',
-			adresse3=kwargs.get('adresse3') or '',
-			code_postal=kwargs.get('codepostal') or '',
+			adresse1=donnees.get('adresse1') or '',
+			adresse2=donnees.get('adresse2') or '',
+			adresse3=donnees.get('adresse3') or '',
+			code_postal=donnees.get('codepostal') or '',
 			ville=libelle_ville,
 			pays=libelle_pays)
 		return re.sub(r'\n+', '\n', raw_adresse).strip()
@@ -209,7 +214,7 @@ class ParcoursupRest:
 		classes ParcoursupCandidat, ParcoursupResponsableLegal et
 		ParcoursupProposition.
 		"""
-		donnees = CaseInsensitiveDict(data=psup_json)
+		donnees = requests.utils.CaseInsensitiveDict(data=psup_json)
 		candidat = ParcoursupCandidat(
 			nom=donnees['nom'],
 			prenom=donnees['prenom'],
@@ -217,8 +222,8 @@ class ParcoursupRest:
 			date_naissance=parse_french_date(donnees['dateNaissance']),
 			code=donnees['codeCandidat'],
 			ine=donnees['ine'],
-			adresse=formate_adresse(**donnees),
-			telephone_fixe = donnes['telfixe'],
+			adresse=self.formate_adresse(donnees),
+			telephone_fixe = donnees['telfixe'],
 			telephone_mobile = donnees['telmobile'],
 			sexe=ParcoursupCandidat.SEXE_HOMME if donnees['sexe'] == 'M'
 				else ParcoursupCandidat.SEXE_FEMME,
@@ -239,8 +244,8 @@ class ParcoursupRest:
 				responsables.append(ParcoursupResponsableLegal(
 					nom=donnees['nomRL{}'.format(i)],
 					prenom=donnees['prenomRL{}'.format(i)],
-					email=donnees['mailRL{}'.format(i)])
-					candidat=candidat)
+					email=donnees['mailRL{}'.format(i)],
+					candidat=candidat))
 			except KeyError:
 				pass
 
@@ -301,7 +306,7 @@ def unsafe_auto_import_rest():
 	)
 	req = psup.get_candidats_admis()
 	candidats = []
-	for psup_json in req.json():
+	for psup_json in req.request.json():
 		candidats.append(psup.parse_parcoursup_admission(psup_json))
 
 	# Liste des codes Parcoursup des candidats admis
@@ -313,7 +318,7 @@ def unsafe_auto_import_rest():
 		psup_prop = candidat['proposition']
 
 		try:
-			etudiant = Etudiant.objects.get(pk=psup_etudiant.numero)
+			etudiant = Etudiant.objects.get(pk=psup_etudiant.code)
 		except Etudiant.DoesNotExist:
 			# On ignore les démissions
 			if psup_prop.etat == ParcoursupProposition.ETAT_REFUSEE:
@@ -326,25 +331,35 @@ def unsafe_auto_import_rest():
 					prenom=psup_etudiant.prenom,
 					email=psup_etudiant.email,
 					adresse=psup_etudiant.adresse,
-					telephone_fixe=psup_etudiant.telephone_fixe,
-					telephone_mobile=psup_etudiant.telephone_mobile,
+					telephone=psup_etudiant.telephone_fixe or '',
+					telephone_mobile=psup_etudiant.telephone_mobile or '',
 					sexe=psup_etudiant.sexe,
 					date_naissance=psup_etudiant.date_naissance
 					)
 			etudiant.save()
 
 		# On enregistre la proposition faite à cet étudiant
-		if psup_prop.etat != ParcoursupPropositon.ETAT_REFUSEE:
-			proposition = Proposition(
-				classe=Classe.objects.get(
-					code_parcoursup=psup_prop.code_formation),
-				etudiant=etudiant,
-				date_proposition=psup_prop.date,
-				internat=psup_prop.internat,
-				cesure=psup_prop.cesure,
-				statut=psup_prop.etat)
-			etudiant.nouvelle_proposition(proposition)
-			codes_admis.append(etudiant.dossier_parcoursup)
+		if psup_prop.etat != ParcoursupProposition.ETAT_REFUSEE:
+			try:
+				if psup_prop.etat == ParcoursupProposition.ETAT_ACCEPTEE:
+					etat_prop = Proposition.ETAT_OUI
+				elif psup_prop.etat == ParcoursupProposition.ETAT_ACCEPTEE_AUTRES_VOEUX:
+					etat_prop = Proposition.ETAT_OUIMAIS
+				else:
+					continue
+
+				proposition = Proposition(
+					classe=Classe.objects.get(
+						code_parcoursup=psup_prop.code_formation),
+					etudiant=etudiant,
+					date_proposition=psup_prop.date,
+					internat=psup_prop.internat,
+					cesure=psup_prop.cesure,
+					etat=etat_prop)
+				etudiant.nouvelle_proposition(proposition)
+				codes_admis.append(etudiant.dossier_parcoursup)
+			except Classe.DoesNotExist:
+				pass
 		else:
 			etudiant.demission(psup_prop.date)
 
@@ -355,17 +370,17 @@ def unsafe_auto_import_rest():
 		etudiant.demission(timezone.now())
 
 def auto_import_rest(mode=ParcoursupSynchro.MODE_MANUEL):
-    # Sauvegarde de l'heure de début, pour l'historique
-    date_debut = timezone.now()
+	# Sauvegarde de l'heure de début, pour l'historique
+	date_debut = timezone.now()
 
-    try:
-        unsafe_auto_import_rest()
-        resultat = ParcoursupSynchro.RESULTAT_OK
-    except:
-        resultat = ParcoursupSynchro.RESULTAT_ERREUR
+	try:
+	    unsafe_auto_import_rest()
+	    resultat = ParcoursupSynchro.RESULTAT_OK
+	except:
+	    resultat = ParcoursupSynchro.RESULTAT_ERREUR
 
-    date_fin = timezone.now()
+	date_fin = timezone.now()
 
-    ParcoursupSynchro(date_debut=date_debut, date_fin=date_fin,
-            mode=mode, resultat=resultat,
+	ParcoursupSynchro(date_debut=date_debut, date_fin=date_fin,
+	        mode=mode, resultat=resultat,
 			source=ParcoursupSynchro.SOURCE_REST).save()
