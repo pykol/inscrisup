@@ -41,6 +41,7 @@ urlpatterns = [
 	path('action/<int:pk>/', views.ActionDetailView.as_view(), name='action.details'),
 	path('action/<int:pk>/traiter', views.action_traiter, name='action.traiter'),
 	path('action/pdf_adresses/', views.export_pdf_adresses, name='action.export_pdf_adresses'),
+	path('action/pdf_adresses/etiquettes', views.export_etiquettes_adresses, name='action.export_pdf_etiquettes_adresses'),
 	path('action/pdf_adresses/definitif', views.export_pdf_adresses_definitif, name='action.export_pdf_adresses_definitif'),
 
 	path('parcoursup/', include(rest_parcoursup_urlpatterns)),

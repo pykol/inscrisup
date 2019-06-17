@@ -31,7 +31,8 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from parcoursup.models import Classe, Etudiant, Action, Proposition, \
         ParcoursupSynchro
 from parcoursup.forms import PropositionForm, ParcoursupImportForm
-from parcoursup.pdf_adresses import pdf_adresses
+from parcoursup.pdf_adresses import pdf_adresses, \
+	pdf_etiquettes_adresses
 from parcoursup.odf_liste import par_classe as odf_par_classe
 from parcoursup.parcoursup_rest import auto_import_rest
 
@@ -201,6 +202,19 @@ def export_pdf_adresse_etudiant(request, pk):
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = 'attachment; filename="adresses_parcoursup.pdf"'
     pdf_adresses(etudiant, response)
+
+    return response
+
+@login_required
+def export_etiquettes_adresses(request):
+    etudiants = Etudiant.objects.filter(
+            proposition__etat=Proposition.ETAT_OUI,
+            proposition__action__etat=Action.ETAT_TODO,
+            proposition__action__categorie__in=(Action.ENVOI_DOSSIER,
+                Action.ENVOI_DOSSIER_INTERNAT))
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="etiquettes_adresses_parcoursup.pdf"'
+    pdf_etiquettes_adresses(etudiants, response)
 
     return response
 
