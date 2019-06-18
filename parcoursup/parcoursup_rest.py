@@ -196,7 +196,7 @@ class ParcoursupRest:
 			libelle_pays = ''
 		else:
 			libelle_ville = donnees.get('commune') or ''
-			libelle_pays = donnees.get('libellepays') or ''
+			libelle_pays = donnees.get('libellepaysadresse') or ''
 
 		raw_adresse = '{adresse1}\n{adresse2}\n{adresse3}\n{code_postal} {ville}\n{pays}'.format(
 			adresse1=donnees.get('adresse1') or '',
