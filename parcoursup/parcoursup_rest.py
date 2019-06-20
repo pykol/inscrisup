@@ -36,10 +36,9 @@ PARCOURSUP_ENDPOINT = "https://ws.parcoursup.fr/ApiRest/"
 
 def parse_date_reponse(date_str):
 	paris_tz = gettz('Europe/Paris')
-	date_match = re.match('^(?P<jour>\d{1,2})/(?P<mois>\d{1,2})/(?P<annee>\d{3}) (?P<heure>\d{1,2}):(?P<minute>\d{1,2})$', date_str)
+	date_match = re.match('^(?P<jour>\d{1,2})/(?P<mois>\d{1,2})/(?P<annee>\d{4}) (?P<heure>\d{1,2}):(?P<minute>\d{1,2})$', date_str)
 	return datetime(
-		# Eh oui, Parcoursup renvoie l'année sur 3 chiffres...
-		year=int(date_match.group('annee')) + 2000,
+		year=int(date_match.group('annee')),
 		month=int(date_match.group('mois')),
 		day=int(date_match.group('jour')),
 		hour=int(date_match.group('heure')),
