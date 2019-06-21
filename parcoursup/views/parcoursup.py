@@ -155,8 +155,8 @@ class ParcoursupClientView(View):
 		except:
 			response = self.json_response(False)
 
-		msg_log.succes = response.get('retour', 'NOK') == 'OK'
-		msg_log.message = response.get('message', "")
+		msg_log.succes = response.content.get('retour', 'NOK') == 'OK'
+		msg_log.message = response.content.get('message', "(Aucun message précisé)")
 		msg_log.save()
 		return response
 
