@@ -120,7 +120,7 @@ def par_classe(classes, fileout):
                 cell.addElement(P(text="Interne"))
             tr.addElement(cell)
 
-            TableCell(parent=tr, valuetype='string').addElement(P(text=etudiant.proposition_actuelle.get_statut_display()))
+            TableCell(parent=tr, valuetype='string').addElement(P(text=etudiant.proposition_actuelle.get_etat_display()))
 
             TableCell(parent=tr, valuetype='string').addElement(P(text=etudiant.email))
             TableCell(parent=tr, valuetype='string').addElement(P(text=etudiant.telephone))
