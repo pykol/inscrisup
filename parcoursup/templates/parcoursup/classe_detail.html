@@ -19,6 +19,7 @@
     <th>Date</th>
     <th colspan="2">Étudiant</th>
     <th>Internat</th>
+    <th>Césure</th>
     <th>Statut</th>
   </tr>
   {% for etudiant in etudiant_list %}
@@ -27,6 +28,7 @@
     <td>{{ etudiant.dossier_parcoursup }}</td>
     <td><a href="{{ etudiant.get_absolute_url }}">{{ etudiant }}</a></td>
     <td>{{ etudiant.proposition_actuelle.internat|yesno }}</td>
+    <td>{{ etudiant.proposition_actuelle.cesure|yesno }}</td>
     <td>{{ etudiant.proposition_actuelle.get_etat_display }}</td>
   </tr>
   {% endfor %}
