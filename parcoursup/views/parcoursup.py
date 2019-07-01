@@ -105,7 +105,7 @@ class ParcoursupClientView(View):
 		response.status_code = status_code
 
 		if msg_log is not None:
-			msg_log.success = data['retour'] == 'OK'
+			msg_log.succes = data['retour'] == 'OK'
 			msg_log.message = data['message']
 
 		return response
