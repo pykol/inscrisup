@@ -78,7 +78,7 @@ class ParcoursupClientView(View):
 		except (json.JSONDecodeError, UnicodeDecodeError):
 			return False
 
-	def json_response(self, ok, message=None, status_code=None):
+	def json_response(self, ok, msg_log=None, message=None, status_code=None):
 		"""
 		Construction d'une réponse pour Parcoursup
 		"""
@@ -103,6 +103,11 @@ class ParcoursupClientView(View):
 
 		response = JsonResponse(data)
 		response.status_code = status_code
+
+		if msg_log is not None:
+			msg_log.success = data['retour'] == 'OK'
+			msg_log.message = data['message']
+
 		return response
 
 	# On redéfinit cette méthode uniquement afin de la décorer, car les
@@ -154,12 +159,10 @@ class ParcoursupClientView(View):
 		msg_log.user = self.user
 
 		try:
-			response = self.parcoursup()
+			response = self.parcoursup(msg_log=msg_log)
 		except:
-			response = self.json_response(False)
+			response = self.json_response(False, msg_log=msg_log)
 
-		msg_log.succes = response.content.get('retour', 'NOK') == 'OK'
-		msg_log.message = response.content.get('message', "(Aucun message précisé)")
 		msg_log.save()
 		return response
 
@@ -170,7 +173,7 @@ class AdmissionView(ParcoursupClientView):
 	"""
 	endpoint = "admissionCandidat"
 
-	def parcoursup(self):
+	def parcoursup(self, msg_log=None):
 		donnees = self.json['donneesCandidat']
 
 		etudiant, _ = Etudiant.objects.update_or_create(
@@ -237,4 +240,4 @@ class AdmissionView(ParcoursupClientView):
 			except Proposition.DoesNotExist:
 				pass
 
-		return self.json_response(True)
+		return self.json_response(True, msg_log=msg_log)
