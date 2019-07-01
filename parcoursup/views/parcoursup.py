@@ -24,6 +24,8 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import View
 from django.utils import timezone
 
+import requests
+
 from parcoursup.models import ParcoursupUser, ParcoursupMessageRecuLog, \
 		Etudiant, Classe, Proposition
 import parcoursup.utils as utils
@@ -70,7 +72,8 @@ class ParcoursupClientView(View):
 			return False
 
 		try:
-			self.json = json.loads(self.request.body.decode('utf-8'))
+			psup_json = json.loads(self.request.body.decode('utf-8'))
+			self.json = requests.utils.CaseInsensitiveDict(data=psup_json)
 			return True
 		except (json.JSONDecodeError, UnicodeDecodeError):
 			return False
