@@ -29,6 +29,7 @@ import requests
 from parcoursup.models import ParcoursupUser, ParcoursupMessageRecuLog, \
 		Etudiant, Classe, Proposition
 import parcoursup.utils as utils
+from parcoursup.parcoursup_rest import ParcoursupRest
 
 class ParcoursupClientView(View):
 	"""
@@ -148,13 +149,13 @@ class ParcoursupClientView(View):
 			msg_log.succes = False
 			msg_log.message = "Les données soumises ne sont pas au format JSON valide"
 			msg_log.save()
-			return self.json_response(False, msg_log.message)
+			return self.json_response(False, message=msg_log.message)
 
 		if not self.identification():
 			msg_log.succes = False
 			msg_log.message = "Données d'identification incorrectes"
 			msg_log.save()
-			return self.json_response(False, msg_log.message)
+			return self.json_response(False, message=msg_log.message)
 
 		msg_log.user = self.user
 
@@ -174,7 +175,13 @@ class AdmissionView(ParcoursupClientView):
 	endpoint = "admissionCandidat"
 
 	def parcoursup(self, msg_log=None):
-		donnees = self.json['donneesCandidat']
+		#donnees = self.json['donneesCandidat']
+		donnees = self.json
+
+		try:
+			adresse = ParcoursupRest.formate_adresse(donnees)
+		except:
+			adresse = '(Inconnue)'
 
 		etudiant, _ = Etudiant.objects.update_or_create(
 			dossier_parcoursup = donnees['codeCandidat'],
@@ -182,16 +189,10 @@ class AdmissionView(ParcoursupClientView):
 				'nom': donnees['nom'],
 				'prenom': donnees['prenom'],
 				'date_naissance': utils.parse_french_date(donnees['dateNaissance']),
-				'email': donnees['mail'],
-				'telephone': donnees.get('telfixe'),
-				'telephone_mobile': donnees.get('telmobile'),
-				'adresse': utils.format_adresse_pays(
-						adresse1=donnees['adresse1'],
-						adresse2=donnees['adresse2'],
-						code_postal=donnees['codePostal'],
-						ville=donnees['libelleCommune'],
-						pays=donnees['codePaysadresse'],
-					),
+				'email': donnees.get('mail'),
+				'telephone': donnees.get('telfixe', ''),
+				'telephone_mobile': donnees.get('telmobile', ''),
+				'adresse': adresse,
 				'sexe': Etudiant.SEXE_HOMME if donnees['sexe'] == 'M' \
 						else Etudiant.SEXE_FEMME
 			})
@@ -204,13 +205,13 @@ class AdmissionView(ParcoursupClientView):
 			etudiant=etudiant,
 			classe=classe,
 			date_proposition=date_reponse,
-			cesure=donnees.get('cesure', 0) == 1,
-			internat=donnees.get('internat', 0) == 1,
-			inscription=donnees.get('etatInscription', 0) == 1,
+			cesure=donnees.get('cesure', '0') == '1',
+			internat=donnees.get('internat', '0') == '1',
+			inscription=donnees.get('etatInscription', '0') == '1',
 		)
 
 		# Le candidat n'a pas encore répondu
-		if donnees['codeSituation'] == 0:
+		if donnees['codeSituation'] == '0':
 			# On n'enregistre dans la base de données que les candidats
 			# qui ont accepté la formation. Ce message provenant de
 			# Parcoursup est donc ignoré. La proposition sera
@@ -219,17 +220,17 @@ class AdmissionView(ParcoursupClientView):
 			pass
 
 		# Proposition acceptée définitivement
-		if donnees['codeSituation'] == 1:
+		if donnees['codeSituation'] == '1':
 			proposition.etat = Proposition.ETAT_OUI
 			etudiant.nouvelle_proposition(proposition)
 
 		# Proposition acceptée avec autres vœux en attente
-		if donnees['codeSituation'] == 2:
+		if donnees['codeSituation'] == '2':
 			proposition.etat = Proposition.ETAT_OUIMAIS
 			etudiant.nouvelle_proposition(proposition)
 
 		# Proposition refusée
-		if donnees['codeSituation'] == 3:
+		if donnees['codeSituation'] == '3':
 			try:
 				proposition = Proposition.objects.get(
 					etudiant=etudiant, classe=classe,
