@@ -35,7 +35,8 @@ from parcoursup.forms import PropositionForm, ParcoursupImportForm
 from parcoursup.pdf_adresses import pdf_adresses, \
 	pdf_etiquettes_adresses
 from parcoursup.odf_liste import par_classe as odf_par_classe
-from parcoursup.parcoursup_rest import auto_import_rest, ParcoursupRest
+from parcoursup.parcoursup_rest import auto_import_rest, \
+		ParcoursupRest, ParcoursupCandidat
 
 from . import parcoursup
 

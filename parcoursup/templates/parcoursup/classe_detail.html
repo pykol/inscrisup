@@ -35,7 +35,7 @@
       {% if etudiant.propositon_actuelle.inscription %}
       Inscription effectuée
       {% else %}
-      <form method="post" action="{% url 'etudiant.inscription' etudiant.pk %}">
+      <form class="valider_inscription" method="post" action="{% url 'etudiant.inscription' etudiant.pk %}">
         {% csrf_token %}
         <button>Valider l'inscription</button>
       </form>
