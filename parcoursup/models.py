@@ -44,7 +44,7 @@ class Etudiant(models.Model):
 	adresse = models.TextField(blank=True, null=False)
 	proposition_actuelle = models.ForeignKey('Proposition', blank=True,
 			null=True, related_name='+', on_delete=models.SET_NULL)
-	ine = models.CharField(blank=True, null=False, default="",
+	ine = models.CharField(blank=True, null=True,
 			max_length=11, verbose_name="INE (numéro d'étudiant)",
 			unique=True)
 

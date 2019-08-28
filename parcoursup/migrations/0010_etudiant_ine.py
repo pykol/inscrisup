@@ -13,6 +13,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='etudiant',
             name='ine',
-            field=models.CharField(blank=True, default='', max_length=11, unique=True, verbose_name="INE (numéro d'étudiant)"),
+            field=models.CharField(blank=True, null=True, max_length=11, unique=True, verbose_name="INE (numéro d'étudiant)"),
         ),
     ]
