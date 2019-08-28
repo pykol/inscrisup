@@ -34,6 +34,7 @@ urlpatterns = [
 	path('etudiant/<int:pk>/', views.EtudiantDetailView.as_view(), name='etudiant.details'),
 	path('etudiant/<int:pk>/pdf_adresse', views.export_pdf_adresse_etudiant, name='etudiant.pdf_adresse'),
 	path('etudiant/<int:pk>/demission', views.etudiant_demission, name='etudiant.demission'),
+	path('etudiant/<int:pk>/inscription', views.etudiant_inscription, name='etudiant.inscription'),
 	path('proposition/ajout/', views.proposition_ajout, name='proposition.ajout'),
 	path('proposition/import/', views.parcoursup_import, name='proposition.parcoursup_import'),
 	path('proposition/import/auto', views.parcoursup_auto_import, name='proposition.parcoursup_auto_import'),

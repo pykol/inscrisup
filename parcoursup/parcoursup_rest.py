@@ -138,7 +138,9 @@ class ParcoursupProposition:
 		self.date = kwargs.get('date')
 
 class ParcoursupRest:
-	def __init__(self, login, password, code_etablissement):
+	def __init__(self, login=settings.PARCOURSUP_REST_LOGIN,
+			password=settings.PARCOURSUP_REST_PASSWORD,
+			code_etablissement=settings.PARCOURSUP_UAI_ETABLISSEMENT):
 		self.login = login
 		self.password = password
 		self.code_etablissement = code_etablissement
@@ -266,17 +268,15 @@ class ParcoursupRest:
 	INSCRIPTION_PARALLELE_SECONDAIRE = 5
 
 	def maj_inscription(self, candidat, formation,
-			code_sise, statut_inscription):
+			etat_inscription):
 		"""
-		Mise à jour du statut d'inscription d'un candidat.
+		Mise à jour de l'état d'inscription d'un candidat.
 		"""
 		request_data = candidat.to_json()
 		request_data.update({
 			'codeFormationPsup': int(formation),
 			'codeFormation1': str(formation),
-			'codeSISE': str(code_sise),
-			'codeStatutInscription': int(statut_inscription),
-			'etatInscription': int(statut_inscription),
+			'etatInscription': int(etat_inscription),
 			'codeEtablissementAffectation': str(self.code_etablissement),
 		})
 		request = ParcoursupRequest(self.login, self.password,

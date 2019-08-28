@@ -27,6 +27,7 @@ from django.urls import reverse
 from django.db.models import Count, Q, F
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views.decorators.http import require_POST
 
 from parcoursup.models import Classe, Etudiant, Action, Proposition, \
         ParcoursupSynchro
@@ -34,7 +35,7 @@ from parcoursup.forms import PropositionForm, ParcoursupImportForm
 from parcoursup.pdf_adresses import pdf_adresses, \
 	pdf_etiquettes_adresses
 from parcoursup.odf_liste import par_classe as odf_par_classe
-from parcoursup.parcoursup_rest import auto_import_rest
+from parcoursup.parcoursup_rest import auto_import_rest, ParcoursupRest
 
 from . import parcoursup
 
@@ -251,3 +252,28 @@ def export_odf_classes(request):
     response['Content-Disposition'] = 'attachment; filename="liste_classes.ods"'
     odf_par_classe(Classe.objects.all().order_by('nom'), response)
     return response
+
+@login_required
+@require_POST
+def etudiant_inscription(request, pk):
+	etudiant = get_object_or_404(Etudiant, pk=pk)
+	if etudiant.proposition_actuelle is not None:
+		psup = ParcoursupRest()
+		candidat = ParcoursupCandidat(code=etudiant.dossier_parcoursup,
+				nom=etudiant.nom,
+				prenom=etudiant.prenom,
+				date_naissance=etudiant.date_naissance,
+				ine=etudiant.ine)
+		req = psup.maj_inscription(candidat,
+				etudiant.proposition_actuelle.classe.code_parcoursup,
+				ParcoursupRest.INSCRIPTION_PRINCIPALE)
+
+		response = req.request.json()
+		if response['retour'] == 'OK':
+			etudiant.proposition_actuelle.inscription = True
+			etudiant.proposition_actuelle.save()
+
+		return redirect('classe.details',
+				slug=etudiant.proposition_actuelle.classe.slug)
+
+	return redirect('index')
