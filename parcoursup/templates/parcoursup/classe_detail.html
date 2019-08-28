@@ -24,7 +24,7 @@
     <th>Inscription</th>
   </tr>
   {% for etudiant in etudiant_list %}
-  <tr class="{% if etudiant.proposition_actuele.inscription %}inscrit{% else %}non_inscrit{% endif %}">
+  <tr class="{% if etudiant.proposition_actuelle.inscription %}inscrit{% else %}non_inscrit{% endif %}">
     <td>{{ etudiant.proposition_actuelle.date_proposition }}</td>
     <td>{{ etudiant.dossier_parcoursup }}</td>
     <td><a href="{{ etudiant.get_absolute_url }}">{{ etudiant }}</a></td>
@@ -32,7 +32,7 @@
     <td>{{ etudiant.proposition_actuelle.cesure|yesno }}</td>
     <td>{{ etudiant.proposition_actuelle.get_etat_display }}</td>
     <td>
-      {% if etudiant.propositon_actuelle.inscription %}
+      {% if etudiant.proposition_actuelle.inscription %}
       Inscription effectuée
       {% else %}
       <form class="valider_inscription" method="post" action="{% url 'etudiant.inscription' etudiant.pk %}">
