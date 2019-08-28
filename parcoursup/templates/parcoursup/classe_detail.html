@@ -36,7 +36,7 @@
       Inscription effectuée
       {% else %}
       <form method="post" action="{% url 'etudiant.inscription' etudiant.pk %}">
-        {{ csrf_token }}
+        {% csrf_token %}
         <button>Valider l'inscription</button>
       </form>
       {% endif %}
