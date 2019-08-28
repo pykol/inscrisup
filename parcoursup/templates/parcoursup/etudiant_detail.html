@@ -5,6 +5,10 @@
 <h3>Coordonnées</h3>
 <table>
   <tr>
+    <td>INE</td>
+    <td>{{ etudiant.ine }}</td>
+  </tr>
+  <tr>
     <td><i class="fas fa-home"></i>Adresse</td>
     <td>{% if etudiant.adresse %}
       {{ etudiant.adresse|linebreaks }}

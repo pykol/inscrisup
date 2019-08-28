@@ -340,6 +340,7 @@ def unsafe_auto_import_rest():
 		etudiant.telephone_mobile = psup_etudiant.telephone_mobile or ''
 		etudiant.sexe = psup_etudiant.sexe
 		etudiant.date_naissance = psup_etudiant.date_naissance
+		etudian.ine = psup_etudiant.ine
 		etudiant.save()
 
 		# On enregistre la proposition faite à cet étudiant
