@@ -276,6 +276,7 @@ class ParcoursupRest:
 		request_data.update({
 			'codeFormationPsup': int(formation),
 			'codeFormation1': str(formation),
+			'codeSISE': int(formation),
 			'etatInscription': int(etat_inscription),
 			'codeEtablissementAffectation': str(self.code_etablissement),
 		})
