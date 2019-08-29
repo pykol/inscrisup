@@ -31,15 +31,16 @@
     <td>{{ etudiant.proposition_actuelle.internat|yesno }}</td>
     <td>{{ etudiant.proposition_actuelle.cesure|yesno }}</td>
     <td>{{ etudiant.proposition_actuelle.get_etat_display }}</td>
-    <td>
-      {% if etudiant.proposition_actuelle.inscription %}
-      Inscription effectuée
-      {% else %}
-      <form class="valider_inscription" method="post" action="{% url 'etudiant.inscription' etudiant.pk %}">
+    <td><form class="valider_inscription" method="post" action="{% url 'etudiant.inscription' etudiant.pk %}">
         {% csrf_token %}
-        <button>Valider l'inscription</button>
+        <button>
+          {% if etudiant.proposition_actuelle.inscription %}
+          Inscription effectuée
+          {% else %}
+          Valider l'inscription
+          {% endif %}
+        </button>
       </form>
-      {% endif %}
     </td>
   </tr>
   {% endfor %}

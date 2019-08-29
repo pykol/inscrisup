@@ -12,8 +12,17 @@
 
 .inscrit {
   background-color: #90ee90;
+
+  button {
+    color: black;
+    text-decoration: none;
+  }
 }
 
 .non_inscrit {
   background-color: #FFE5B4;
+  button {
+    color: #069;
+    text-decoration: underline;
+  }
 }
